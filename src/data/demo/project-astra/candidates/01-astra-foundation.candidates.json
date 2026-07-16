@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "documentId": "astra-doc-001",
+  "entities": [
+    {
+      "candidateId": "cand-astra-001-nova",
+      "entityType": "character",
+      "name": "Nova Arclight",
+      "aliases": ["Nova"],
+      "description": "A celestial cartographer in the Astra Survey Corps.",
+      "attributes": { "age": 17, "role": "celestial cartographer" },
+      "tags": ["cartographer", "astra-survey"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "Nova Arclight, known as Nova, is a 17-year-old celestial cartographer and a member of the Astra Survey Corps."
+        }
+      ]
+    },
+    {
+      "candidateId": "cand-astra-001-corps",
+      "entityType": "organization",
+      "name": "Astra Survey Corps",
+      "aliases": ["ASC"],
+      "description": "An organization that investigates celestial anomalies.",
+      "attributes": { "purpose": "celestial survey" },
+      "tags": ["organization", "astronomy"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a member of the Astra Survey Corps"
+        }
+      ]
+    },
+    {
+      "candidateId": "cand-astra-001-observatory",
+      "entityType": "location",
+      "name": "Northstar Observatory",
+      "aliases": [],
+      "description": "An observatory where a repeating signal was detected.",
+      "attributes": { "function": "observation" },
+      "tags": ["observatory"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a repeating signal detected at Northstar Observatory"
+        }
+      ]
+    },
+    {
+      "candidateId": "cand-astra-001-briefing",
+      "entityType": "scene",
+      "name": "First Light Briefing",
+      "aliases": [],
+      "description": "A briefing where Nova reports the repeating signal.",
+      "attributes": { "status": "recorded" },
+      "tags": ["briefing", "signal"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "At the First Light Briefing, Nova reports a repeating signal"
+        }
+      ]
+    },
+    {
+      "candidateId": "cand-astra-001-compass",
+      "entityType": "item",
+      "name": "Aster Compass",
+      "aliases": [],
+      "description": "A silver compass carried by Nova.",
+      "attributes": { "material": "silver" },
+      "tags": ["instrument"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "Nova carries the silver Aster Compass."
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "candidateId": "relcand-astra-001-member",
+      "fromRef": { "candidateId": "cand-astra-001-nova" },
+      "toRef": { "candidateId": "cand-astra-001-corps" },
+      "relationType": "member_of",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a member of the Astra Survey Corps"
+        }
+      ]
+    },
+    {
+      "candidateId": "relcand-astra-001-carries",
+      "fromRef": { "candidateId": "cand-astra-001-nova" },
+      "toRef": { "candidateId": "cand-astra-001-compass" },
+      "relationType": "carries",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "Nova carries the silver Aster Compass."
+        }
+      ]
+    },
+    {
+      "candidateId": "relcand-astra-001-appears",
+      "fromRef": { "candidateId": "cand-astra-001-nova" },
+      "toRef": { "candidateId": "cand-astra-001-briefing" },
+      "relationType": "appears_in",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "At the First Light Briefing, Nova reports a repeating signal"
+        }
+      ]
+    },
+    {
+      "candidateId": "relcand-astra-001-located",
+      "fromRef": { "candidateId": "cand-astra-001-briefing" },
+      "toRef": { "candidateId": "cand-astra-001-observatory" },
+      "relationType": "located_at",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a repeating signal detected at Northstar Observatory"
+        }
+      ]
+    }
+  ]
+}

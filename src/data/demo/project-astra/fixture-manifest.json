@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "order": 1,
+      "fileName": "01-astra-foundation.md",
+      "format": "markdown",
+      "mediaType": "text/markdown",
+      "contentSha256": "5139d3e2917131dae4a668cb647e66a03a46b1125382ec68d628cb16bbb8382a",
+      "documentId": "astra-doc-001",
+      "reviewSessionId": "review-astra-001"
+    },
+    {
+      "order": 2,
+      "fileName": "02-nova-archive-revision.md",
+      "format": "markdown",
+      "mediaType": "text/markdown",
+      "contentSha256": "8ab49641a815b22c1ba22add3ce0911f4509409bc625fe3a0d557c1b8ff818cb",
+      "documentId": "astra-doc-002",
+      "reviewSessionId": "review-astra-002"
+    },
+    {
+      "order": 3,
+      "fileName": "03-unknown-nova-log.md",
+      "format": "markdown",
+      "mediaType": "text/markdown",
+      "contentSha256": "0e7fbfa0d653a5aae3b3ce295e1e0d6e2ae3e8b2b818227489484f6ab8b2016e",
+      "documentId": "astra-doc-003",
+      "reviewSessionId": "review-astra-003"
+    },
+    {
+      "order": 4,
+      "fileName": "04-quiet-prism-card.md",
+      "format": "markdown",
+      "mediaType": "text/markdown",
+      "contentSha256": "a9f8da4d64b644d4875ab61b74e3e9fa629f9d2f9385463718c1361dc11bc98d",
+      "documentId": "astra-doc-004",
+      "reviewSessionId": "review-astra-004"
+    }
+  ],
+  "expected": {
+    "finalKnowledgeFile": "expected/final-knowledge.json",
+    "expectedInsightsFile": "expected/expected-insights.json",
+    "finalKnowledgeRevision": 4
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "duplicateGroups": [
+    {
+      "normalizedKey": "nova",
+      "entityIds": ["ent-astra-001", "ent-astra-006"]
+    }
+  ],
+  "conflicts": [
+    {
+      "entityId": "ent-astra-001",
+      "attributeKey": "age",
+      "canonicalValue": 17,
+      "claimValues": [17, 18],
+      "conflictResolvedAt": null
+    }
+  ],
+  "orphanEntityIds": ["ent-astra-007"],
+  "statistics": {
+    "entityCount": 7,
+    "entityCountByType": {
+      "character": 2,
+      "scene": 1,
+      "location": 1,
+      "item": 2,
+      "organization": 1
+    },
+    "relationshipCount": 5,
+    "orphanCount": 1,
+    "unresolvedConflictCount": 1
+  }
+}

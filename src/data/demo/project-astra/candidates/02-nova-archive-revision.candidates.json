@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "documentId": "astra-doc-002",
+  "entities": [
+    {
+      "candidateId": "cand-astra-002-nova",
+      "entityType": "character",
+      "name": "Nova",
+      "aliases": [],
+      "description": "A later archive entry for Nova.",
+      "attributes": { "age": 18 },
+      "tags": ["archive-revision"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-002",
+          "fileName": "02-nova-archive-revision.md",
+          "excerpt": "A later archive lists Nova as 18 years old"
+        }
+      ]
+    },
+    {
+      "candidateId": "cand-astra-002-observatory",
+      "entityType": "location",
+      "name": "North Star Observatory",
+      "aliases": [],
+      "description": "An alternate spelling found in the archive.",
+      "attributes": {},
+      "tags": ["archive-revision"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-002",
+          "fileName": "02-nova-archive-revision.md",
+          "excerpt": "The archive spells the observation site as “North Star Observatory.”"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "candidateId": "relcand-astra-002-member",
+      "fromRef": { "candidateId": "cand-astra-002-nova" },
+      "toRef": { "name": "Astra Survey Corps", "entityType": "organization" },
+      "relationType": "ＭＥＭＢＥＲ＿ＯＦ",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-002",
+          "fileName": "02-nova-archive-revision.md",
+          "excerpt": "Nova remains a member of the Astra Survey Corps"
+        }
+      ]
+    }
+  ]
+}

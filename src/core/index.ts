@@ -4,6 +4,7 @@ export * from "./entities/attributeRecord";
 export * from "./entities/entity";
 export * from "./entities/entityNameIndex";
 export * from "./import";
+export * from "./insights";
 export * from "./knowledge";
 export * from "./relationships/relationship";
 export * from "./relationships/relationshipKey";

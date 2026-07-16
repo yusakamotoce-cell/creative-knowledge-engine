@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "documentId": "astra-doc-004",
+  "entities": [
+    {
+      "candidateId": "cand-astra-004-prism",
+      "entityType": "item",
+      "name": "Quiet Prism",
+      "aliases": [],
+      "description": "An item with no recorded owner, location, or known use.",
+      "attributes": { "status": "unassigned" },
+      "tags": ["inventory", "unassigned"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-004",
+          "fileName": "04-quiet-prism-card.md",
+          "excerpt": "The inventory lists an item named Quiet Prism."
+        }
+      ]
+    },
+    {
+      "candidateId": "cand-astra-004-royal-key",
+      "entityType": "item",
+      "name": "Royal Key",
+      "aliases": [],
+      "description": "A speculative interpretation written in the margin.",
+      "attributes": {},
+      "tags": ["speculative"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-004",
+          "fileName": "04-quiet-prism-card.md",
+          "excerpt": "A penciled margin says “Royal Key?”, but this is only a guess."
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "candidateId": "relcand-astra-004-points",
+      "fromRef": { "candidateId": "cand-astra-004-prism" },
+      "toRef": { "name": "Outer Gate", "entityType": "location" },
+      "relationType": "points_to",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-004",
+          "fileName": "04-quiet-prism-card.md",
+          "excerpt": "A second note claims that the Quiet Prism points toward an Outer Gate, but no such location has been established in the archive."
+        }
+      ]
+    }
+  ]
+}

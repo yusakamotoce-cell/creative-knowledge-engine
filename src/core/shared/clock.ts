@@ -19,6 +19,14 @@ export class SequenceClock implements Clock {
     this.values = values.map((value) => isoDateTimeSchema.parse(value));
   }
 
+  get consumedCount(): number {
+    return this.nextIndex;
+  }
+
+  get remainingCount(): number {
+    return this.values.length - this.nextIndex;
+  }
+
   now(): string {
     const value = this.values[this.nextIndex];
 

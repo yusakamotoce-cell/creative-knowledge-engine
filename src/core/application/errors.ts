@@ -3,6 +3,10 @@ export const applicationErrorCodes = [
   "REVIEW_SESSION_NOT_COMPLETE",
   "REVIEW_SESSION_ALREADY_APPLIED",
   "KNOWLEDGE_REVISION_CONFLICT",
+  "INVALID_REVIEW_SESSION",
+  "REVIEW_SESSION_ID_MISMATCH",
+  "REVIEW_SESSION_DOCUMENT_ID_CHANGED",
+  "REVIEW_SESSION_BASE_REVISION_CHANGED",
 ] as const;
 
 export type ApplicationErrorCode = (typeof applicationErrorCodes)[number];

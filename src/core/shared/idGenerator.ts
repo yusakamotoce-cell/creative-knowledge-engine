@@ -34,6 +34,14 @@ export class SequenceIdGenerator implements IdGenerator {
     this.#ids = [...ids];
   }
 
+  get consumedCount(): number {
+    return this.#index;
+  }
+
+  get remainingCount(): number {
+    return this.#ids.length - this.#index;
+  }
+
   nextId(prefix: string): string {
     void prefix;
     const id = this.#ids[this.#index];

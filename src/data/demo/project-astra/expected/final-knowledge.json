@@ -1,0 +1,354 @@
+{
+  "entities": [
+    {
+      "id": "ent-astra-001",
+      "entityType": "character",
+      "name": "Nova Arclight",
+      "aliases": ["Nova"],
+      "description": "A celestial cartographer in the Astra Survey Corps.",
+      "attributes": {
+        "age": {
+          "canonicalValue": 17,
+          "claims": [
+            {
+              "value": 17,
+              "sourceRef": {
+                "documentId": "astra-doc-001",
+                "fileName": "01-astra-foundation.md",
+                "excerpt": "Nova Arclight, known as Nova, is a 17-year-old celestial cartographer and a member of the Astra Survey Corps."
+              }
+            },
+            {
+              "value": 18,
+              "sourceRef": {
+                "documentId": "astra-doc-002",
+                "fileName": "02-nova-archive-revision.md",
+                "excerpt": "A later archive lists Nova as 18 years old"
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        },
+        "role": {
+          "canonicalValue": "celestial cartographer",
+          "claims": [
+            {
+              "value": "celestial cartographer",
+              "sourceRef": {
+                "documentId": "astra-doc-001",
+                "fileName": "01-astra-foundation.md",
+                "excerpt": "Nova Arclight, known as Nova, is a 17-year-old celestial cartographer and a member of the Astra Survey Corps."
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["cartographer", "astra-survey", "archive-revision"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "Nova Arclight, known as Nova, is a 17-year-old celestial cartographer and a member of the Astra Survey Corps."
+        },
+        {
+          "documentId": "astra-doc-002",
+          "fileName": "02-nova-archive-revision.md",
+          "excerpt": "A later archive lists Nova as 18 years old"
+        }
+      ],
+      "createdAt": "2026-07-16T00:01:00.000Z",
+      "updatedAt": "2026-07-16T00:12:00.000Z"
+    },
+    {
+      "id": "ent-astra-002",
+      "entityType": "organization",
+      "name": "Astra Survey Corps",
+      "aliases": ["ASC"],
+      "description": "An organization that investigates celestial anomalies.",
+      "attributes": {
+        "purpose": {
+          "canonicalValue": "celestial survey",
+          "claims": [
+            {
+              "value": "celestial survey",
+              "sourceRef": {
+                "documentId": "astra-doc-001",
+                "fileName": "01-astra-foundation.md",
+                "excerpt": "a member of the Astra Survey Corps"
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["organization", "astronomy"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a member of the Astra Survey Corps"
+        }
+      ],
+      "createdAt": "2026-07-16T00:02:00.000Z",
+      "updatedAt": "2026-07-16T00:02:00.000Z"
+    },
+    {
+      "id": "ent-astra-003",
+      "entityType": "location",
+      "name": "Northstar Observatory",
+      "aliases": [],
+      "description": "An observatory where a repeating signal was detected.",
+      "attributes": {
+        "function": {
+          "canonicalValue": "observation",
+          "claims": [
+            {
+              "value": "observation",
+              "sourceRef": {
+                "documentId": "astra-doc-001",
+                "fileName": "01-astra-foundation.md",
+                "excerpt": "a repeating signal detected at Northstar Observatory"
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["observatory", "archive-revision"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a repeating signal detected at Northstar Observatory"
+        },
+        {
+          "documentId": "astra-doc-002",
+          "fileName": "02-nova-archive-revision.md",
+          "excerpt": "The archive spells the observation site as “North Star Observatory.”"
+        }
+      ],
+      "createdAt": "2026-07-16T00:03:00.000Z",
+      "updatedAt": "2026-07-16T00:13:00.000Z"
+    },
+    {
+      "id": "ent-astra-004",
+      "entityType": "scene",
+      "name": "First Light Briefing",
+      "aliases": [],
+      "description": "A briefing where Nova reports the repeating signal.",
+      "attributes": {
+        "status": {
+          "canonicalValue": "recorded",
+          "claims": [
+            {
+              "value": "recorded",
+              "sourceRef": {
+                "documentId": "astra-doc-001",
+                "fileName": "01-astra-foundation.md",
+                "excerpt": "At the First Light Briefing, Nova reports a repeating signal"
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["briefing", "signal"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "At the First Light Briefing, Nova reports a repeating signal"
+        }
+      ],
+      "createdAt": "2026-07-16T00:04:00.000Z",
+      "updatedAt": "2026-07-16T00:04:00.000Z"
+    },
+    {
+      "id": "ent-astra-005",
+      "entityType": "item",
+      "name": "Aster Compass",
+      "aliases": [],
+      "description": "A silver compass carried by Nova.",
+      "attributes": {
+        "material": {
+          "canonicalValue": "silver",
+          "claims": [
+            {
+              "value": "silver",
+              "sourceRef": {
+                "documentId": "astra-doc-001",
+                "fileName": "01-astra-foundation.md",
+                "excerpt": "Nova carries the silver Aster Compass."
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["instrument"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "Nova carries the silver Aster Compass."
+        }
+      ],
+      "createdAt": "2026-07-16T00:05:00.000Z",
+      "updatedAt": "2026-07-16T00:05:00.000Z"
+    },
+    {
+      "id": "ent-astra-006",
+      "entityType": "character",
+      "name": "ＮＯＶＡ",
+      "aliases": [],
+      "description": "An unidentified masked operator using the name NOVA.",
+      "attributes": {
+        "identitystatus": {
+          "canonicalValue": "unverified",
+          "claims": [
+            {
+              "value": "unverified",
+              "sourceRef": {
+                "documentId": "astra-doc-003",
+                "fileName": "03-unknown-nova-log.md",
+                "excerpt": "A masked operator signed the field log as “ＮＯＶＡ.”"
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["masked-operator", "unverified"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-003",
+          "fileName": "03-unknown-nova-log.md",
+          "excerpt": "A masked operator signed the field log as “ＮＯＶＡ.”"
+        }
+      ],
+      "createdAt": "2026-07-16T00:17:00.000Z",
+      "updatedAt": "2026-07-16T00:17:00.000Z"
+    },
+    {
+      "id": "ent-astra-007",
+      "entityType": "item",
+      "name": "Quiet Prism",
+      "aliases": [],
+      "description": "An item with no recorded owner, location, or known use.",
+      "attributes": {
+        "status": {
+          "canonicalValue": "unassigned",
+          "claims": [
+            {
+              "value": "unassigned",
+              "sourceRef": {
+                "documentId": "astra-doc-004",
+                "fileName": "04-quiet-prism-card.md",
+                "excerpt": "The inventory lists an item named Quiet Prism."
+              }
+            }
+          ],
+          "conflictResolvedAt": null
+        }
+      },
+      "tags": ["inventory", "unassigned"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-004",
+          "fileName": "04-quiet-prism-card.md",
+          "excerpt": "The inventory lists an item named Quiet Prism."
+        }
+      ],
+      "createdAt": "2026-07-16T00:21:00.000Z",
+      "updatedAt": "2026-07-16T00:21:00.000Z"
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel-astra-001",
+      "fromEntityId": "ent-astra-001",
+      "toEntityId": "ent-astra-002",
+      "relationType": "member_of",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a member of the Astra Survey Corps"
+        },
+        {
+          "documentId": "astra-doc-002",
+          "fileName": "02-nova-archive-revision.md",
+          "excerpt": "Nova remains a member of the Astra Survey Corps"
+        }
+      ],
+      "createdAt": "2026-07-16T00:06:00.000Z",
+      "updatedAt": "2026-07-16T00:14:00.000Z"
+    },
+    {
+      "id": "rel-astra-002",
+      "fromEntityId": "ent-astra-001",
+      "toEntityId": "ent-astra-005",
+      "relationType": "carries",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "Nova carries the silver Aster Compass."
+        }
+      ],
+      "createdAt": "2026-07-16T00:07:00.000Z",
+      "updatedAt": "2026-07-16T00:07:00.000Z"
+    },
+    {
+      "id": "rel-astra-003",
+      "fromEntityId": "ent-astra-001",
+      "toEntityId": "ent-astra-004",
+      "relationType": "appears_in",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "At the First Light Briefing, Nova reports a repeating signal"
+        }
+      ],
+      "createdAt": "2026-07-16T00:08:00.000Z",
+      "updatedAt": "2026-07-16T00:08:00.000Z"
+    },
+    {
+      "id": "rel-astra-004",
+      "fromEntityId": "ent-astra-004",
+      "toEntityId": "ent-astra-003",
+      "relationType": "located_at",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-001",
+          "fileName": "01-astra-foundation.md",
+          "excerpt": "a repeating signal detected at Northstar Observatory"
+        }
+      ],
+      "createdAt": "2026-07-16T00:09:00.000Z",
+      "updatedAt": "2026-07-16T00:09:00.000Z"
+    },
+    {
+      "id": "rel-astra-005",
+      "fromEntityId": "ent-astra-006",
+      "toEntityId": "ent-astra-004",
+      "relationType": "appears_in",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-003",
+          "fileName": "03-unknown-nova-log.md",
+          "excerpt": "The operator was present at the First Light Briefing."
+        }
+      ],
+      "createdAt": "2026-07-16T00:18:00.000Z",
+      "updatedAt": "2026-07-16T00:18:00.000Z"
+    }
+  ]
+}

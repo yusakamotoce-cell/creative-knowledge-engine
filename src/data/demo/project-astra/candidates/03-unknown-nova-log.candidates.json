@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "documentId": "astra-doc-003",
+  "entities": [
+    {
+      "candidateId": "cand-astra-003-unknown-nova",
+      "entityType": "character",
+      "name": "ＮＯＶＡ",
+      "aliases": [],
+      "description": "An unidentified masked operator using the name NOVA.",
+      "attributes": { "identityStatus": "unverified" },
+      "tags": ["masked-operator", "unverified"],
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-003",
+          "fileName": "03-unknown-nova-log.md",
+          "excerpt": "A masked operator signed the field log as “ＮＯＶＡ.”"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "candidateId": "relcand-astra-003-appears",
+      "fromRef": { "candidateId": "cand-astra-003-unknown-nova" },
+      "toRef": { "name": "First Light Briefing", "entityType": "scene" },
+      "relationType": "appears_in",
+      "description": "",
+      "sourceRefs": [
+        {
+          "documentId": "astra-doc-003",
+          "fileName": "03-unknown-nova-log.md",
+          "excerpt": "The operator was present at the First Light Briefing."
+        }
+      ]
+    }
+  ]
+}
