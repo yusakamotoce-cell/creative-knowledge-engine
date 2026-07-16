@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "bundleId": "ctx_project_astra_nova_001",
+  "generatedAt": "2026-07-15T21:00:00+09:00",
+  "purpose": {
+    "preset": "scene_drafting",
+    "instruction": "NovaがAstra Academyの図書室でSilver Keyを使う短いScene案を作成する。未解決Conflictは断定せず、候補を分けて扱う。"
+  },
+  "selection": {
+    "rootEntityIds": [
+      "character_nova"
+    ],
+    "traversalDepth": 1,
+    "traversalDirection": "both",
+    "sourceMode": "excerpt"
+  },
+  "budget": {
+    "maxCharacters": 12000,
+    "actualCharacters": 4076,
+    "truncated": true
+  },
+  "entities": [
+    {
+      "detailLevel": "full",
+      "id": "character_nova",
+      "entityType": "character",
+      "name": "Nova",
+      "aliases": [
+        "The Architect"
+      ],
+      "description": "A planner at Astra Academy.",
+      "attributes": {
+        "age": {
+          "canonicalValue": 17,
+          "conflictState": "unresolved",
+          "canonicalSourceRefIds": [
+            "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79"
+          ],
+          "claims": [
+            {
+              "value": 17,
+              "sourceRefId": "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79"
+            },
+            {
+              "value": "17",
+              "sourceRefId": "sha256:2f8151a9cee50c5a5abe129ad6bb8e0f79c3dd2a0cc23cca29c6769101067db5"
+            }
+          ]
+        },
+        "role": {
+          "canonicalValue": "architect",
+          "conflictState": "none",
+          "canonicalSourceRefIds": [
+            "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79"
+          ]
+        }
+      },
+      "tags": [
+        "planner"
+      ],
+      "sourceRefIds": [
+        "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79",
+        "sha256:2f8151a9cee50c5a5abe129ad6bb8e0f79c3dd2a0cc23cca29c6769101067db5",
+        "sha256:7a4be744b74d5fa8ceed1f760b64a0bdd1ab41f18a892a0c38ae08608c640b64"
+      ],
+      "updatedAt": "2026-07-15T20:45:00+09:00"
+    },
+    {
+      "detailLevel": "full",
+      "id": "organization_astra_academy",
+      "entityType": "organization",
+      "name": "Astra Academy",
+      "aliases": [],
+      "description": "An academy where Nova belongs.",
+      "attributes": {},
+      "tags": [
+        "academy"
+      ],
+      "sourceRefIds": [
+        "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79"
+      ],
+      "updatedAt": "2026-07-15T20:40:00+09:00"
+    },
+    {
+      "detailLevel": "stub",
+      "id": "scene_library_meeting",
+      "entityType": "scene",
+      "name": "Library Meeting"
+    },
+    {
+      "detailLevel": "stub",
+      "id": "item_silver_key",
+      "entityType": "item",
+      "name": "Silver Key"
+    }
+  ],
+  "relationships": [
+    {
+      "id": "relationship_nova_member_of_astra",
+      "fromEntityId": "character_nova",
+      "toEntityId": "organization_astra_academy",
+      "relationType": "member_of",
+      "description": "",
+      "sourceRefIds": [
+        "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79"
+      ]
+    },
+    {
+      "id": "relationship_nova_appears_in_library_meeting",
+      "fromEntityId": "character_nova",
+      "toEntityId": "scene_library_meeting",
+      "relationType": "appears_in",
+      "description": "",
+      "sourceRefIds": [
+        "sha256:7a4be744b74d5fa8ceed1f760b64a0bdd1ab41f18a892a0c38ae08608c640b64"
+      ]
+    },
+    {
+      "id": "relationship_nova_owns_silver_key",
+      "fromEntityId": "character_nova",
+      "toEntityId": "item_silver_key",
+      "relationType": "owns",
+      "description": "",
+      "sourceRefIds": [
+        "sha256:7a4be744b74d5fa8ceed1f760b64a0bdd1ab41f18a892a0c38ae08608c640b64"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "sha256:49b0459848a3394c57b62e0836c9a4c483ce6a6b871095ed10a410e43f0e4a79",
+      "documentId": "doc-nova-profile",
+      "fileName": "nova.md",
+      "excerpt": "Nova is a 17-year-old planner and a member of Astra Academy."
+    },
+    {
+      "id": "sha256:2f8151a9cee50c5a5abe129ad6bb8e0f79c3dd2a0cc23cca29c6769101067db5",
+      "documentId": "doc-nova-profile-rev2",
+      "fileName": "nova-rev2.json",
+      "excerpt": "A later profile lists Nova's age as \"17\" in a text field."
+    },
+    {
+      "id": "sha256:7a4be744b74d5fa8ceed1f760b64a0bdd1ab41f18a892a0c38ae08608c640b64",
+      "documentId": "doc-library-meeting",
+      "fileName": "library-meeting.md",
+      "excerpt": "Nova appears in the Library Meeting and carries the Silver Key."
+    }
+  ],
+  "diagnostics": {
+    "unresolvedConflictCount": 1,
+    "omittedEntityIds": [],
+    "omittedRelationshipIds": [],
+    "warnings": [
+      {
+        "code": "ENTITY_DOWNGRADED_TO_STUB",
+        "message": "Library Meeting was included as a stub to remain within the character budget.",
+        "entityId": "scene_library_meeting"
+      },
+      {
+        "code": "ENTITY_DOWNGRADED_TO_STUB",
+        "message": "Silver Key was included as a stub to remain within the character budget.",
+        "entityId": "item_silver_key"
+      },
+      {
+        "code": "UNRESOLVED_CONFLICT_INCLUDED",
+        "message": "Nova.age contains values with different types and remains unresolved.",
+        "entityId": "character_nova"
+      }
+    ]
+  },
+  "integrity": {
+    "sourceSnapshotSha256": "8f882b0785155580b6835e907bd8261a90ba21ecf9876ee84b2b5885676b9e68",
+    "bundleSha256": "a593b3ab4cca824c93455d99ef76a696cfd15a9f2ccfacc6f8775040483095b8"
+  }
+}
