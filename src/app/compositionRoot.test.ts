@@ -8,6 +8,8 @@ import {
   createProjectAstraClock,
   createProjectAstraIdGenerator,
 } from "./compositionRoot";
+import { RemoteExtractionAdapter } from "./extraction";
+import { FixtureExtractionAdapter } from "../core/import";
 
 describe("browser composition root", () => {
   beforeEach(() => window.localStorage.clear());
@@ -18,6 +20,17 @@ describe("browser composition root", () => {
 
     expect(window.localStorage.getItem(defaultLocalStorageKey)).toContain(
       '"schemaVersion":1',
+    );
+  });
+
+  it("injects separate Fixture and Remote extraction adapters", () => {
+    const dependencies = createBrowserApplicationDependencies();
+
+    expect(dependencies.fixtureExtractionAdapter).toBeInstanceOf(
+      FixtureExtractionAdapter,
+    );
+    expect(dependencies.liveExtractionAdapter).toBeInstanceOf(
+      RemoteExtractionAdapter,
     );
   });
 

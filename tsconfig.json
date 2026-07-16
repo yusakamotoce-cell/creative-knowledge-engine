@@ -22,6 +22,7 @@
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
   },
   "include": [
+    "api",
     "src",
     "vite.config.ts",
     "vitest.config.ts"

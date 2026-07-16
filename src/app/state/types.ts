@@ -31,7 +31,8 @@ export type ResetIntent = "empty" | "demo" | null;
 
 export interface ApplicationDependencies {
   storage: StorageAdapter;
-  extractionAdapter: ExtractionAdapter;
+  fixtureExtractionAdapter: ExtractionAdapter;
+  liveExtractionAdapter: ExtractionAdapter;
   hasher: Sha256Hasher;
   idGenerator: IdGenerator;
   clock: Clock;

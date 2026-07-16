@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "smoke:live-ai": "node scripts/smoke-live-ai.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

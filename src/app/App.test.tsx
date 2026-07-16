@@ -92,14 +92,15 @@ describe("App", () => {
     expect(storage.loads).toBe(2);
   });
 
-  it("navigates to Import and exposes the current extraction limitation", async () => {
+  it("navigates to Import and exposes Live AI consent", async () => {
     render(<App dependencies={createTestApplicationDependencies()} />);
     await screen.findByRole("heading", { name: /散らばった設定/ });
 
     fireEvent.click(screen.getByRole("button", { name: "文書をImport" }));
 
     expect(screen.getByRole("heading", { name: "文書をImport" })).toBeInTheDocument();
-    expect(screen.getByText(/Live AI抽出は後続Step/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "GPT-5.6 Live Extraction" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox")).not.toBeChecked();
     expect(screen.getByLabelText("本文")).toBeInTheDocument();
   });
 
@@ -172,7 +173,7 @@ describe("App", () => {
     expect((await storage.load()).knowledgeRevision).toBe(4);
   });
 
-  it("does not partially save an arbitrary document when no Fixture result exists", async () => {
+  it("does not partially save an arbitrary document when Live AI is unavailable", async () => {
     const storage = new MemoryStorageAdapter();
     render(<App dependencies={createTestApplicationDependencies(storage)} />);
     await screen.findByRole("heading", { name: /散らばった設定/ });
@@ -180,10 +181,11 @@ describe("App", () => {
     fireEvent.change(screen.getByLabelText("本文"), {
       target: { value: "# Unknown world" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "文書をImport" }));
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "GPT-5.6で抽出してReview" }));
 
     expect(
-      await screen.findByText("保存済みの抽出結果がありません"),
+      await screen.findByText("Live AIを利用できません"),
     ).toBeInTheDocument();
     const snapshot = await storage.load();
     expect(snapshot.importedDocuments).toEqual([]);

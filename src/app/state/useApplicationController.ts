@@ -230,7 +230,7 @@ export function useApplicationController(
         },
         {
           storage: dependencies.storage,
-          extractionAdapter: dependencies.extractionAdapter,
+          extractionAdapter: dependencies.fixtureExtractionAdapter,
           hasher: dependencies.hasher,
           idGenerator: dependencies.createProjectAstraIdGenerator(snapshot),
           clock: dependencies.createProjectAstraClock(snapshot),
@@ -344,7 +344,13 @@ export function useApplicationController(
   const importArbitraryDocument = useCallback(
     (input: ImportDocumentInput) =>
       runBusy(async () => {
-        const result = await importDocument(input, dependencies);
+        const result = await importDocument(input, {
+          storage: dependencies.storage,
+          extractionAdapter: dependencies.liveExtractionAdapter,
+          hasher: dependencies.hasher,
+          idGenerator: dependencies.idGenerator,
+          clock: dependencies.clock,
+        });
         const session =
           result.status === "imported"
             ? result.reviewSession

@@ -50,20 +50,19 @@ function renderView(actions = createActions(), isBusy = false) {
 }
 
 describe("ImportView", () => {
-  it("shows the next ordered Demo document and the extraction limitation", () => {
+  it("shows the offline Demo and the explicit Live AI privacy notice", () => {
     renderView();
 
     expect(screen.getByRole("heading", { name: "01-astra-foundation.md" })).toBeInTheDocument();
-    expect(screen.getByText(/Live AI抽出は後続Step/)).toBeInTheDocument();
-    expect(screen.getByText(/部分保存されません/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "GPT-5.6 Live Extraction" })).toBeInTheDocument();
+    expect(screen.getByText(/本文をOpenAI APIへ送信/)).toBeInTheDocument();
+    expect(screen.getByText(/API keyはブラウザーへ保存・送信しません/)).toBeInTheDocument();
   });
 
   it("rejects empty pasted content before calling the controller", () => {
     const actions = renderView();
 
-    fireEvent.click(screen.getByRole("button", { name: "文書をImport" }));
-
-    expect(screen.getByText("Importする本文を入力してください。")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "GPT-5.6で抽出してReview" })).toBeDisabled();
     expect(actions.importArbitraryDocument).not.toHaveBeenCalled();
   });
 
@@ -81,8 +80,9 @@ describe("ImportView", () => {
     fireEvent.change(screen.getByLabelText("本文"), {
       target: { value: '{"name":"Nova"}' },
     });
+    fireEvent.click(screen.getByRole("checkbox"));
 
-    fireEvent.click(screen.getByRole("button", { name: "文書をImport" }));
+    fireEvent.click(screen.getByRole("button", { name: "GPT-5.6で抽出してReview" }));
 
     expect(actions.importArbitraryDocument).toHaveBeenCalledWith({
       sourceKind: "pasted_text",
@@ -104,7 +104,8 @@ describe("ImportView", () => {
       target: { files: [file] },
     });
     await waitFor(() => expect(screen.getByLabelText("本文")).toHaveValue("# Nova\n"));
-    fireEvent.click(screen.getByRole("button", { name: "文書をImport" }));
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "GPT-5.6で抽出してReview" }));
 
     expect(actions.importArbitraryDocument).toHaveBeenCalledWith({
       sourceKind: "file",
@@ -134,6 +135,19 @@ describe("ImportView", () => {
     renderView(createActions(), true);
 
     expect(screen.getByRole("button", { name: "ImportしてReview" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "文書をImport" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "GPT-5.6で抽出してReview" })).toBeDisabled();
+  });
+
+  it("shows the character count and blocks content over 20,000 characters", () => {
+    const actions = renderView();
+    fireEvent.change(screen.getByLabelText("本文"), {
+      target: { value: "a".repeat(20_001) },
+    });
+    fireEvent.click(screen.getByRole("checkbox"));
+
+    expect(screen.getByText("20,001 / 20,000文字")).toBeInTheDocument();
+    expect(screen.getByText("本文は20,000文字以内にしてください。")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "GPT-5.6で抽出してReview" })).toBeDisabled();
+    expect(actions.importArbitraryDocument).not.toHaveBeenCalled();
   });
 });

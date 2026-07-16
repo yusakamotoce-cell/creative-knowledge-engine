@@ -16,7 +16,39 @@ const errorMessages: Record<string, Omit<UiError, "code">> = {
   FIXTURE_NOT_FOUND: {
     title: "保存済みの抽出結果がありません",
     detail:
-      "現在はProject Astra Demoの文書だけを抽出できます。Live AI抽出は後続Stepで提供します。",
+      "Project Astra DemoのFixtureと文書内容が一致しません。Fixtureを確認してください。",
+  },
+  LIVE_AI_UNAVAILABLE: {
+    title: "Live AIを利用できません",
+    detail: "サーバー設定または接続状態を確認して、明示的に再試行してください。",
+  },
+  LIVE_AI_REQUEST_INVALID: {
+    title: "送信する文書を確認してください",
+    detail: "本文、ファイル名、形式、サイズを確認してください。",
+  },
+  LIVE_AI_RATE_LIMITED: {
+    title: "Live AIの利用が一時的に制限されています",
+    detail: "しばらく待ってから、明示的に再試行してください。",
+  },
+  LIVE_AI_TIMEOUT: {
+    title: "Live AIの応答が時間内に完了しませんでした",
+    detail: "入力内容は保持されています。必要に応じて再試行してください。",
+  },
+  LIVE_AI_REFUSED: {
+    title: "Live AIがこの文書を処理できませんでした",
+    detail: "文書内容を確認してください。Candidateは保存されていません。",
+  },
+  LIVE_AI_OUTPUT_INCOMPLETE: {
+    title: "Live AIの抽出結果が不完全です",
+    detail: "Candidateは保存されていません。文書を短くして再試行できます。",
+  },
+  LIVE_AI_INVALID_RESPONSE: {
+    title: "Live AIの抽出結果を検証できませんでした",
+    detail: "SchemaまたはSourceRefの検証に失敗しました。Candidateは保存されていません。",
+  },
+  LIVE_AI_EXTRACTION_FAILED: {
+    title: "Live AI抽出に失敗しました",
+    detail: "入力内容は保持されています。状態を確認して再試行してください。",
   },
   CANDIDATE_ALREADY_REVIEWED: {
     title: "Candidateは処理済みです",

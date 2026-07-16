@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository currently implements **Step 0–7: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, the complete browser review workflow, deterministic Search, a read-only Knowledge Graph, and versioned Knowledge JSON Export**.
+This repository currently implements **Step 0–8: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, the browser review workflow, deterministic Search, a read-only Knowledge Graph, versioned Knowledge JSON Export, and optional server-side GPT-5.6 Live Extraction**.
 
 Implemented:
 
@@ -56,13 +56,20 @@ Implemented:
 - injected browser download adapter with deterministic date-based filenames
 - automated domain and application smoke tests
 - architecture decision records
+- server-only OpenAI Responses API extraction through `POST /api/extract`
+- strict request and response envelopes with safe error mapping and `no-store`
+- strict OpenAI provider DTO with key/value attribute arrays, converted server-side to the unchanged domain Candidate Bundle
+- GPT-5.6 Structured Outputs followed by provider validation, conversion, Candidate Bundle Zod validation, and grounding
+- exact SourceRef grounding on both server and Remote Extraction Adapter
+- explicit Fixture-versus-Live adapter routing with no fallback
+- Live AI consent, character limit, retained input, and explicit retry UI
 
-Not implemented through Step 7:
+Not implemented through Step 8:
 
 - IndexedDB adapter and multi-tab synchronization
-- Live AI and serverless functions
 - Context Bundle
-- Step 8 or later functionality
+- authentication, billing, public endpoint rate limiting, and semantic Search
+- Step 9 or later functionality
 
 ## Core boundaries
 
@@ -72,7 +79,7 @@ Not implemented through Step 7:
 - Entity resolution compares names and aliases only after Unicode NFKC normalization, trimming, whitespace collapse, and lowercasing. It does not use fuzzy matching, edit distance, embeddings, semantic similarity, or AI identity decisions.
 - Cross-Entity links are stored as directional Relationships rather than duplicated inside Entities.
 - Demo Mode uses the official Project Astra fixture and works without an API key or live AI access.
-- Live AI is not implemented in this step.
+- Arbitrary-document Live AI is explicit and server-mediated; Project Astra never uses it or falls back to it.
 
 ## Requirements
 
@@ -102,7 +109,31 @@ Open the URL printed by Vite. The browser stores one versioned Snapshot under Lo
 
 The four-document Demo is network-free and needs no API key. Refresh at any point to resume the last successfully saved Import, Review phase, decision, or completed-but-not-applied Session.
 
-Arbitrary pasted text and `.txt`, `.md`, `.markdown`, and `.json` files can be submitted through Import. Step 6 intentionally has only Fixture-based extraction, so content without a saved Project Astra extraction result reports `FIXTURE_NOT_FOUND` and is not partially saved.
+### GPT-5.6 Live Extraction
+
+Arbitrary pasted text and `.txt`, `.md`, `.markdown`, and `.json` files use the explicitly injected Remote Extraction Adapter. Before sending, the UI explains that document content is transmitted to OpenAI, requires consent, and enforces a 20,000-character limit. Results always enter Candidate Review and are never auto-Accepted.
+
+Copy `.env.example` to the serverless runtime's local environment and set the key only there:
+
+```text
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5.6
+LIVE_AI_ENABLED=true
+```
+
+Never create `VITE_OPENAI_API_KEY`. The browser, Local Storage, source, logs, and error responses must not contain the key. `npm run dev` always supports the Fixture Demo; Live extraction additionally needs a compatible local serverless runtime serving `api/extract.ts` at same-origin `/api/extract`. The deployment platform is intentionally not finalized in Step 8.
+
+The endpoint uses the OpenAI Responses API with `store: false` and strict Structured Outputs. The OpenAI-only provider DTO represents attributes as required `{ key, value }` array items so every generated object can use `additionalProperties: false`. The server rejects duplicate or empty keys and `normalizeAttributeKey` collisions, converts the array to the unchanged domain `Record<string, ScalarValue>`, then applies the existing Candidate Bundle Zod Schema and exact raw SourceRef grounding. It does not retry automatically. Refusal, incomplete output, rate limit, timeout, unavailable service, and invalid output leave the input available for an explicit retry and create no partial saved state.
+
+`store: false` controls whether the generated OpenAI Response is retained for later API retrieval. It is intentionally used together with, not replaced by, the endpoint's `Cache-Control: no-store` response header.
+
+For a real endpoint smoke after the local serverless route is running:
+
+```bash
+npm run smoke:live-ai
+```
+
+The command uses one short synthetic document and treats a missing server-side key as **not run**, never as success. Configure OpenAI project budgets and rate limits before enabling a public endpoint.
 
 ### Search, Graph, and Export
 
@@ -123,6 +154,7 @@ npm test
 npm run typecheck
 npm run lint
 npm run build
+npm audit --offline --audit-level=low
 ```
 
 Run only the official Project Astra fixture checks with:
@@ -134,8 +166,11 @@ npm test -- src/data/demo/project-astra
 ## Directory structure
 
 ```text
+api/
+  extract.ts              thin serverless HTTP adapter
 src/
-  app/                    Step 7 shell, controller, views, download adapter, review UI
+  app/                    Step 8 shell, controller, views, Remote adapter, review UI
+  server/live-extraction/ prompt, JSON Schema, Responses client, grounding service, HTTP handling
   core/
     application/          canonical apply, Review Session save, initialization
     candidates/           Candidate Bundle schemas
@@ -164,9 +199,11 @@ Tests are colocated with the domain files they cover. Project Astra contains fou
 
 ## Application and domain boundaries
 
-The Step 0–7 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review, Import, apply, initialization, persistence, reset, Insights, Search, Graph, and Export functions remain React-independent.
+The Step 0–8 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review, Import, apply, initialization, persistence, reset, Insights, Search, Graph, Export, and grounding functions remain React-independent.
 
 `src/app/compositionRoot.ts` is the only application module that accesses `window.localStorage` or loads the Project Astra Fixture for runtime injection. `useApplicationController` owns operation order, busy protection, saved Snapshot adoption, retries, and error mapping. Views receive state and actions as props.
+
+Server modules are never imported by the browser composition path. The composition root injects separate Fixture and Remote adapters; controller actions choose one explicitly. Components do not call `fetch`, OpenAI, or Local Storage directly.
 
 Browser download APIs are isolated in `src/app/download/fileDownloadAdapter.ts`. Components never create Blobs, object URLs, or temporary anchors directly. Search and Graph are pure consumers of the current Snapshot and do not write query, filters, zoom, coordinates, or projection results to Storage.
 
@@ -205,10 +242,10 @@ The final browser state is 7 Entities, 5 Relationships, revision 4, one Duplicat
 
 ## Manual verification
 
-The Step 6 workflow checklist remains in `notes/reviews/STEP_6_MANUAL_CHECKLIST.md`. Step 7 Search, Graph, Export, keyboard, downloaded-file, 1280 px, and 768 px checks are recorded in `notes/reviews/STEP_7_MANUAL_CHECKLIST.md`.
+The Step 6 workflow checklist remains in `notes/reviews/STEP_6_MANUAL_CHECKLIST.md`. Step 7 Search, Graph, and Export checks are in `notes/reviews/STEP_7_MANUAL_CHECKLIST.md`. Step 8 Live AI consent, endpoint, failure, security, and real-smoke checks are in `notes/reviews/STEP_8_MANUAL_CHECKLIST.md`.
 
 ## Deferred integration questions
 
-IndexedDB, multi-tab synchronization, Live AI, serverless functions, Context Bundle, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 8+ behavior are deferred.
+IndexedDB, multi-tab synchronization, Context Bundle, authentication, billing, public endpoint rate limiting, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 9+ behavior are deferred.
 
-The Step 7 decisions are recorded in `notes/reviews/STEP_7_IMPLEMENTATION_DECISIONS.md`.
+The Step 8 decisions are recorded in `notes/reviews/STEP_8_IMPLEMENTATION_DECISIONS.md`.

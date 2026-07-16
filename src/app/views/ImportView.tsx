@@ -3,6 +3,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import type { ImportDocumentInput, ImportFormat } from "../../core/import";
 import type { StorageSnapshot } from "../../core/storage";
 import type { ProjectAstraFixture } from "../../data/demo/project-astra";
+import { LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS } from "../extraction";
 import {
   deriveProjectAstraProgress,
   getNextProjectAstraStep,
@@ -33,9 +34,17 @@ export function ImportView(props: {
   const [format, setFormat] = useState<ImportFormat>("markdown");
   const [mediaType, setMediaType] = useState("text/markdown");
   const [content, setContent] = useState("");
+  const [consent, setConsent] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const progress = deriveProjectAstraProgress(props.snapshot, props.projectAstra);
   const next = getNextProjectAstraStep(props.snapshot, props.projectAstra);
+  const contentOverLimit =
+    content.length > LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS;
+  const displayedFormError =
+    formError ??
+    (contentOverLimit
+      ? `本文は${LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS.toLocaleString()}文字以内にしてください。`
+      : null);
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -57,6 +66,16 @@ export function ImportView(props: {
     event.preventDefault();
     if (content.length === 0) {
       setFormError("Importする本文を入力してください。");
+      return;
+    }
+    if (contentOverLimit) {
+      setFormError(
+        `本文は${LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS.toLocaleString()}文字以内にしてください。`,
+      );
+      return;
+    }
+    if (!consent) {
+      setFormError("OpenAI APIへの送信を確認してください。");
       return;
     }
     setFormError(null);
@@ -120,9 +139,9 @@ export function ImportView(props: {
 
         <section className="panel" aria-labelledby="custom-import-title">
           <p className="eyebrow">Arbitrary document</p>
-          <h2 id="custom-import-title">任意文書</h2>
+          <h2 id="custom-import-title">GPT-5.6 Live Extraction</h2>
           <p className="callout warning-callout">
-            現在利用できる抽出結果はDemo Mode用だけです。任意文書のLive AI抽出は後続Stepで実装します。失敗した文書は部分保存されません。
+            本文をOpenAI APIへ送信してCandidateを抽出します。結果は自動登録せず、必ずReviewで確認します。API keyはブラウザーへ保存・送信しません。
           </p>
           <form className="form-stack" onSubmit={submit}>
             <label>
@@ -161,11 +180,43 @@ export function ImportView(props: {
             </div>
             <label>
               本文
-              <textarea rows={12} value={content} onChange={(event) => setContent(event.target.value)} />
+              <textarea
+                rows={12}
+                value={content}
+                aria-describedby="live-content-count import-form-error"
+                onChange={(event) => {
+                  setContent(event.target.value);
+                  setFormError(null);
+                }}
+              />
             </label>
-            {formError !== null && <p id="import-form-error" className="form-error">{formError}</p>}
-            <button className="primary-button" type="submit" disabled={props.isBusy}>
-              文書をImport
+            <p id="live-content-count" aria-live="polite">
+              {content.length.toLocaleString()} / {LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS.toLocaleString()}文字
+            </p>
+            <label className="consent-check">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(event) => setConsent(event.target.checked)}
+              />
+              この文書内容が抽出のためOpenAI APIへ送信されることを確認しました。
+            </label>
+            {displayedFormError !== null && (
+              <p id="import-form-error" className="form-error" aria-live="assertive">
+                {displayedFormError}
+              </p>
+            )}
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={
+                props.isBusy ||
+                !consent ||
+                content.length === 0 ||
+                contentOverLimit
+              }
+            >
+              GPT-5.6で抽出してReview
             </button>
           </form>
         </section>

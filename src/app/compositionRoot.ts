@@ -10,6 +10,7 @@ import {
 } from "../data/demo/project-astra";
 import type { ApplicationDependencies } from "./state/types";
 import { BrowserFileDownloadAdapter } from "./download/fileDownloadAdapter";
+import { RemoteExtractionAdapter } from "./extraction";
 
 function collectStoredIds(snapshot: StorageSnapshot): Set<string> {
   const ids = new Set<string>();
@@ -73,12 +74,15 @@ export function createBrowserApplicationDependencies(): ApplicationDependencies 
 
   return {
     storage: new LocalStorageAdapter({ storage: window.localStorage }),
-    extractionAdapter: new FixtureExtractionAdapter(
+    fixtureExtractionAdapter: new FixtureExtractionAdapter(
       projectAstra.sources.map((source) => ({
         contentSha256: source.contentSha256,
         candidateBundle: source.candidateBundle,
       })),
     ),
+    liveExtractionAdapter: new RemoteExtractionAdapter({
+      fetcher: (input, init) => window.fetch(input, init),
+    }),
     hasher: new WebCryptoSha256Hasher(),
     idGenerator: new CryptoIdGenerator(),
     clock: new SystemClock(),
