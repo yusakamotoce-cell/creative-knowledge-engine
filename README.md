@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository currently implements **Step 0–1: repository foundation and domain contracts**.
+This repository currently implements **Step 0–2: domain contracts and Candidate Review**.
 
 Implemented:
 
@@ -19,20 +19,28 @@ Implemented:
 - immutable AttributeRecord creation, claim addition, Conflict resolution, and Conflict reopening
 - direction-preserving Relationship duplicate keys
 - deterministic string and SourceRef unions
+- immutable in-memory Review Sessions with `entities → relationships → complete` phases
+- Entity Candidate Edit, Accept as new, Merge, and Reject operations
+- Candidate attribute provenance expansion across all Candidate SourceRefs
+- immediate `candidateId → registeredEntityId` mapping for Accept and Merge
+- deterministic Relationship reference resolution and typed blocked states
+- manual Relationship endpoint resolution
+- Relationship Accept, duplicate-key consolidation, and Reject operations
+- injectable production and sequence Clocks
 - automated domain and application smoke tests
 - architecture decision records
 
-Not implemented in Step 0–1:
+Not implemented through Step 2:
 
 - Project Astra fixture files
-- Candidate Review UI or state transitions
+- Candidate Review UI
 - Import UI or parsing flow
 - Storage Adapter implementation
 - Knowledge Insights screens
 - Graph and Search
 - Live AI and serverless functions
 - Context Bundle
-- Step 2 or later functionality
+- Step 3 or later functionality
 
 ## Core boundaries
 
@@ -78,7 +86,9 @@ src/
   core/
     candidates/           Candidate Bundle schemas
     entities/             Entity, AttributeRecord, Duplicate logic
+    knowledge/            immutable in-memory KnowledgeState
     relationships/        Relationship schema and duplicate key
+    review/               two-stage Candidate Review domain
     insights/             reserved for a later step
     import/               reserved for a later step
     storage/              reserved for a later step
@@ -93,18 +103,21 @@ notes/
   submission/              future Build Week submission material
 ```
 
-Tests are colocated with the domain files they cover. No Project Astra fixture data is generated in Step 0–1.
+Tests are colocated with the domain files they cover. No Project Astra fixture data is generated through Step 2.
 
 ## Domain entry point
 
-The Step 0–1 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior.
+The Step 0–2 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review functions use an injected Clock and ID generator and do not depend on React or Storage.
+
+## Candidate Review behavior
+
+- Candidate Review is a fixed two-stage flow: all Entity Candidates finish before Relationship references are resolved.
+- Accept and Merge update Knowledge immediately and register the Candidate-to-Entity mapping immediately.
+- A blocked Relationship requires manual endpoint resolution or explicit Reject; a reject recommendation never auto-rejects it.
+- Candidate attributes use all distinct Candidate SourceRefs for provenance.
 
 ## Deferred integration questions
 
-Three rules remain explicitly deferred because their workflows are outside Step 0–1:
+Search string normalization remains deliberately unresolved because Search is outside Step 2. Candidate Review UI, durable session persistence, Project Astra Fixture generation, and all Step 3+ behavior are also deferred.
 
-- how Merge updates the `candidateId → registeredEntityId` map;
-- how a Candidate attribute selects SourceRefs when converted into AttributeClaims;
-- how Search normalizes query and indexed strings.
-
-They are recorded in `notes/reviews/STEP_0-1_IMPLEMENTATION_DECISIONS.md` and must be resolved before their respective later-step implementations.
+The Step 2 decisions and Project Astra carryover are recorded in `notes/reviews/STEP_2_IMPLEMENTATION_DECISIONS.md`.
