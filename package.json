@@ -3,12 +3,17 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "smoke:live-ai": "node scripts/smoke-live-ai.mjs",
+    "smoke:deployment": "node scripts/smoke-deployment.mjs",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

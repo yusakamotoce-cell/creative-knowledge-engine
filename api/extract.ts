@@ -1,5 +1,6 @@
 import {
   createLiveExtractionHttpHandler,
+  type FetchLike,
   LiveExtractionService,
   OpenAiResponsesClient,
 } from "../src/server/live-extraction";
@@ -8,60 +9,67 @@ declare const process: {
   env: Readonly<Record<string, string | undefined>>;
 };
 
-interface ApiRequest {
-  method?: string;
-  headers: Readonly<Record<string, string | string[] | undefined>>;
-  body?: unknown;
+export interface ExtractFunctionEnvironment {
+  readonly OPENAI_API_KEY?: string;
+  readonly OPENAI_MODEL?: string;
+  readonly LIVE_AI_ENABLED?: string;
 }
 
-interface ApiResponse {
-  status(statusCode: number): ApiResponse;
-  setHeader(name: string, value: string): void;
-  json(body: unknown): void;
+export interface ExtractFunctionDependencies {
+  readonly environment: ExtractFunctionEnvironment;
+  readonly fetcher: FetchLike;
 }
 
-function requestBody(body: unknown): unknown {
-  if (typeof body !== "string") return body;
+async function readRequestBody(request: Request): Promise<unknown> {
+  if (request.method.toUpperCase() !== "POST") return undefined;
   try {
-    return JSON.parse(body);
+    return await request.json();
   } catch {
-    return body;
+    return undefined;
   }
 }
 
-export default async function handler(
-  request: ApiRequest,
-  response: ApiResponse,
-): Promise<void> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const enabled = process.env.LIVE_AI_ENABLED !== "false";
-  const model = process.env.OPENAI_MODEL;
-  const service =
-    apiKey === undefined || apiKey.trim().length === 0
-      ? undefined
-      : new LiveExtractionService(
-          new OpenAiResponsesClient({
-            apiKey,
-            ...(model === undefined ? {} : { model }),
-            fetcher: (input, init) => fetch(input, init),
-          }),
-        );
-  const httpHandler = createLiveExtractionHttpHandler({
-    enabled,
-    ...(service === undefined ? {} : { service }),
-  });
+export function createExtractFetchHandler(
+  dependencies: ExtractFunctionDependencies,
+): (request: Request) => Promise<Response> {
+  return async (request) => {
+    const apiKey = dependencies.environment.OPENAI_API_KEY;
+    const model = dependencies.environment.OPENAI_MODEL;
+    const enabled = dependencies.environment.LIVE_AI_ENABLED !== "false";
+    const service =
+      apiKey === undefined || apiKey.trim().length === 0
+        ? undefined
+        : new LiveExtractionService(
+            new OpenAiResponsesClient({
+              apiKey,
+              ...(model === undefined ? {} : { model }),
+              fetcher: dependencies.fetcher,
+            }),
+          );
+    const httpHandler = createLiveExtractionHttpHandler({
+      enabled,
+      ...(service === undefined ? {} : { service }),
+    });
+    const result = await httpHandler({
+      method: request.method,
+      contentType: request.headers.get("content-type") ?? undefined,
+      body: await readRequestBody(request),
+    });
 
-  const contentTypeHeader = request.headers["content-type"];
-  const result = await httpHandler({
-    method: request.method,
-    contentType: Array.isArray(contentTypeHeader)
-      ? contentTypeHeader[0]
-      : contentTypeHeader,
-    body: requestBody(request.body),
-  });
-
-  for (const [name, value] of Object.entries(result.headers)) {
-    response.setHeader(name, value);
-  }
-  response.status(result.status).json(result.body);
+    return Response.json(result.body, {
+      status: result.status,
+      headers: result.headers,
+    });
+  };
 }
+
+const extractFunction = {
+  fetch(request: Request): Promise<Response> {
+    return createExtractFetchHandler({
+      environment: process.env,
+      fetcher: (input, init) => fetch(input, init),
+    })(request);
+  },
+};
+
+export default extractFunction;

@@ -29,7 +29,7 @@ function clientFor(
   options: { model?: string; timeoutMs?: number } = {},
 ) {
   return new OpenAiResponsesClient({
-    apiKey: "server-secret-value",
+    apiKey: "test-api-token",
     fetcher,
     ...options,
   });
@@ -51,7 +51,7 @@ describe("OpenAiResponsesClient", () => {
     expect(url).toBe(OPENAI_RESPONSES_API_URL);
     expect(init?.method).toBe("POST");
     expect(init?.headers).toEqual({
-      Authorization: "Bearer server-secret-value",
+      Authorization: "Bearer test-api-token",
       "Content-Type": "application/json",
     });
     const body = JSON.parse(String(init?.body)) as Record<string, unknown>;

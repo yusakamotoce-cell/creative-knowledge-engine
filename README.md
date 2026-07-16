@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository currently implements **Step 0–8: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, the browser review workflow, deterministic Search, a read-only Knowledge Graph, versioned Knowledge JSON Export, and optional server-side GPT-5.6 Live Extraction**.
+This repository implements **Step 0–8** and the local, authentication-free preparation for **Step 9**: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, browser review, deterministic Search, a read-only Knowledge Graph, versioned Knowledge JSON Export, optional server-side GPT-5.6 Live Extraction, and Vercel deployment checks. Step 9 remains blocked until Preview/Production and a real OpenAI API smoke pass.
 
 Implemented:
 
@@ -63,13 +63,18 @@ Implemented:
 - exact SourceRef grounding on both server and Remote Extraction Adapter
 - explicit Fixture-versus-Live adapter routing with no fallback
 - Live AI consent, character limit, retained input, and explicit retry UI
+- Vercel Web-standard adapters for `/api/extract` and non-billable `/api/health`
+- Node 22.x deployment pin and Vite auto-detection contract
+- opt-in public deployment smoke with exact SourceRef validation
+- tracked/source/build secret-value inspection
 
-Not implemented through Step 8:
+Not implemented or not completed through the current Step 9 preparation:
 
 - IndexedDB adapter and multi-tab synchronization
 - Context Bundle
-- authentication, billing, public endpoint rate limiting, and semantic Search
-- Step 9 or later functionality
+- authentication, billing, and semantic Search
+- authenticated GitHub/Vercel/OpenAI setup, Vercel Firewall publication, deployment, and real OpenAI API verification
+- Step 10 or later functionality
 
 ## Core boundaries
 
@@ -83,7 +88,7 @@ Not implemented through Step 8:
 
 ## Requirements
 
-- Node.js 22 or later
+- Node.js 22.x
 - npm 10 or later
 
 ## Setup
@@ -121,7 +126,7 @@ OPENAI_MODEL=gpt-5.6
 LIVE_AI_ENABLED=true
 ```
 
-Never create `VITE_OPENAI_API_KEY`. The browser, Local Storage, source, logs, and error responses must not contain the key. `npm run dev` always supports the Fixture Demo; Live extraction additionally needs a compatible local serverless runtime serving `api/extract.ts` at same-origin `/api/extract`. The deployment platform is intentionally not finalized in Step 8.
+Never create `VITE_OPENAI_API_KEY`. The browser, Local Storage, source, logs, and error responses must not contain the key. `npm run dev` always supports the Fixture Demo; Live extraction additionally needs a compatible local serverless runtime serving `api/extract.ts` at same-origin `/api/extract`. Step 8 left the platform open; Step 9 fixes Vercel as the deployment target.
 
 The endpoint uses the OpenAI Responses API with `store: false` and strict Structured Outputs. The OpenAI-only provider DTO represents attributes as required `{ key, value }` array items so every generated object can use `additionalProperties: false`. The server rejects duplicate or empty keys and `normalizeAttributeKey` collisions, converts the array to the unchanged domain `Record<string, ScalarValue>`, then applies the existing Candidate Bundle Zod Schema and exact raw SourceRef grounding. It does not retry automatically. Refusal, incomplete output, rate limit, timeout, unavailable service, and invalid output leave the input available for an explicit retry and create no partial saved state.
 
@@ -134,6 +139,47 @@ npm run smoke:live-ai
 ```
 
 The command uses one short synthetic document and treats a missing server-side key as **not run**, never as success. Configure OpenAI project budgets and rate limits before enabling a public endpoint.
+
+### Vercel deployment
+
+Vercel is the fixed submission target. The project uses Vite auto-detection, runs `npm run build`, publishes `dist`, and serves Web-standard TypeScript functions from `api/`. No `vercel.json` is required for the current layout. Preview must pass before Production.
+
+Configure Preview and Production separately with server-only values:
+
+```text
+OPENAI_API_KEY=<server-only secret>
+OPENAI_MODEL=gpt-5.6
+LIVE_AI_ENABLED=false
+```
+
+Begin with Live AI disabled. Verify the Fixture Demo, then publish a Vercel Firewall rate limit for `POST /api/extract`: same IP/client, five requests per minute, HTTP 429. Only then set `LIVE_AI_ENABLED=true` and run the real smoke. Production follows the same sequence after Preview passes. Use a dedicated OpenAI Project with a minimal key and configured usage notification/budget.
+
+`GET /api/health` never calls OpenAI. It returns only the fixed service envelope and whether Live AI has both a non-disabled setting and a non-blank server key. It does not prove upstream connectivity. All API responses use `Cache-Control: no-store`.
+
+Run the non-billable public checks with:
+
+```powershell
+$env:DEPLOYMENT_URL="<Preview URL>"
+npm.cmd run smoke:deployment
+```
+
+Run exactly one synthetic real API check only after the key and Firewall are configured:
+
+```powershell
+$env:DEPLOYMENT_URL="<Preview URL>"
+$env:RUN_LIVE_AI="true"
+npm.cmd run smoke:deployment
+```
+
+The command never prints or saves the raw response and never retries. A missing deployment URL returns a blocked non-success result. Inspect tracked/source/build artifacts with `npm run scan:secrets`.
+
+Public app URL:
+
+Repository URL:
+
+Stable commit:
+
+These fields remain blank until authenticated deployment and real API verification succeed.
 
 ### Search, Graph, and Export
 
@@ -155,6 +201,7 @@ npm run typecheck
 npm run lint
 npm run build
 npm audit --offline --audit-level=low
+npm run scan:secrets
 ```
 
 Run only the official Project Astra fixture checks with:
@@ -167,10 +214,15 @@ npm test -- src/data/demo/project-astra
 
 ```text
 api/
-  extract.ts              thin serverless HTTP adapter
+  extract.ts              thin Vercel Web adapter over Live extraction
+  health.ts               secret-safe, non-billable health adapter
+scripts/
+  smoke-deployment.mjs    public deployment and opt-in real API smoke
+  scan-secrets.mjs        source/build secret-value inspection
 src/
   app/                    Step 8 shell, controller, views, Remote adapter, review UI
   server/live-extraction/ prompt, JSON Schema, Responses client, grounding service, HTTP handling
+  server/health/          pure health response handling
   core/
     application/          canonical apply, Review Session save, initialization
     candidates/           Candidate Bundle schemas
@@ -242,10 +294,10 @@ The final browser state is 7 Entities, 5 Relationships, revision 4, one Duplicat
 
 ## Manual verification
 
-The Step 6 workflow checklist remains in `notes/reviews/STEP_6_MANUAL_CHECKLIST.md`. Step 7 Search, Graph, and Export checks are in `notes/reviews/STEP_7_MANUAL_CHECKLIST.md`. Step 8 Live AI consent, endpoint, failure, security, and real-smoke checks are in `notes/reviews/STEP_8_MANUAL_CHECKLIST.md`.
+The Step 6 workflow checklist remains in `notes/reviews/STEP_6_MANUAL_CHECKLIST.md`. Step 7 Search, Graph, and Export checks are in `notes/reviews/STEP_7_MANUAL_CHECKLIST.md`. Step 8 Live AI consent, endpoint, failure, and security checks are in `notes/reviews/STEP_8_MANUAL_CHECKLIST.md`. Step 9 Preview, Production, WAF, public browser, and real API status is in `notes/reviews/STEP_9_DEPLOYMENT_CHECKLIST.md`.
 
 ## Deferred integration questions
 
-IndexedDB, multi-tab synchronization, Context Bundle, authentication, billing, public endpoint rate limiting, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 9+ behavior are deferred.
+IndexedDB, multi-tab synchronization, Context Bundle, authentication, billing, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 10+ behavior are deferred. Step 9's platform rate limit is specified but remains blocked on authenticated Vercel configuration.
 
-The Step 8 decisions are recorded in `notes/reviews/STEP_8_IMPLEMENTATION_DECISIONS.md`.
+The Step 9 deployment status and decisions are recorded in `notes/reviews/STEP_9_DEPLOYMENT_CHECKLIST.md` and `notes/reviews/STEP_9_IMPLEMENTATION_DECISIONS.md`. Step 9 is currently `BLOCKED: REAL_API_NOT_VERIFIED`; local mock success is not a real API pass.
