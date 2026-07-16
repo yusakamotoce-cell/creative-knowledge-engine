@@ -151,7 +151,11 @@ describe("App", () => {
     render(<App dependencies={createTestApplicationDependencies(storage)} />);
     await screen.findByRole("heading", { name: /散らばった設定/ });
     fireEvent.click(screen.getByRole("button", { name: "Knowledge" }));
-    await waitFor(() => expect(screen.getByText("Revision").nextSibling).toHaveTextContent("4"));
+    await waitFor(() =>
+      expect(
+        within(screen.getByLabelText("Knowledge revision")).getByText("4"),
+      ).toBeInTheDocument(),
+    );
   });
 
   it("requires explicit confirmation before resetting a saved workspace", async () => {

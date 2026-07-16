@@ -9,6 +9,7 @@ import {
   projectAstraIdSequence,
 } from "../data/demo/project-astra";
 import type { ApplicationDependencies } from "./state/types";
+import { BrowserFileDownloadAdapter } from "./download/fileDownloadAdapter";
 
 function collectStoredIds(snapshot: StorageSnapshot): Set<string> {
   const ids = new Set<string>();
@@ -82,6 +83,8 @@ export function createBrowserApplicationDependencies(): ApplicationDependencies 
     idGenerator: new CryptoIdGenerator(),
     clock: new SystemClock(),
     projectAstra,
+    fileDownloadAdapter: new BrowserFileDownloadAdapter(),
+    exportDateProvider: () => new Date(),
     createProjectAstraIdGenerator,
     createProjectAstraClock,
   };

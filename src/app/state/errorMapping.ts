@@ -1,6 +1,18 @@
 import type { UiError } from "./types";
 
 const errorMessages: Record<string, Omit<UiError, "code">> = {
+  INVALID_KNOWLEDGE_EXPORT: {
+    title: "Knowledge JSONを作成できません",
+    detail: "現在のKnowledgeを確認してから再試行してください。",
+  },
+  FILE_DOWNLOAD_FAILED: {
+    title: "JSONをダウンロードできません",
+    detail: "ブラウザーのダウンロード設定を確認して再試行してください。",
+  },
+  GRAPH_PROJECTION_FAILED: {
+    title: "Knowledge Graphを作成できません",
+    detail: "登録済みKnowledgeの整合性を確認してください。",
+  },
   FIXTURE_NOT_FOUND: {
     title: "保存済みの抽出結果がありません",
     detail:

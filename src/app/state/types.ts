@@ -3,9 +3,18 @@ import type { IdGenerator } from "../../core/shared/idGenerator";
 import type { Sha256Hasher } from "../../core/shared/sha256";
 import type { ExtractionAdapter } from "../../core/import/extractionAdapter";
 import type { StorageAdapter, StorageSnapshot } from "../../core/storage";
+import type { EntitySearchFilters } from "../../core/search";
+import type { KnowledgeGraphFilters } from "../../core/graph";
 import type { ProjectAstraFixture } from "../../data/demo/project-astra";
+import type { FileDownloadAdapter } from "../download/fileDownloadAdapter";
 
-export type AppView = "home" | "import" | "review" | "knowledge";
+export type AppView =
+  | "home"
+  | "import"
+  | "review"
+  | "knowledge"
+  | "search"
+  | "graph";
 
 export type UiMessage =
   | { kind: "success"; text: string }
@@ -27,6 +36,8 @@ export interface ApplicationDependencies {
   idGenerator: IdGenerator;
   clock: Clock;
   projectAstra: ProjectAstraFixture;
+  fileDownloadAdapter: FileDownloadAdapter;
+  exportDateProvider(): Date;
   createProjectAstraIdGenerator(snapshot: StorageSnapshot): IdGenerator;
   createProjectAstraClock(snapshot: StorageSnapshot): Clock;
 }
@@ -37,6 +48,11 @@ export interface ApplicationControllerState {
   snapshot: StorageSnapshot | null;
   activeReviewSessionId: string | null;
   selectedEntityId: string | null;
+  selectedRelationshipId: string | null;
+  searchQuery: string;
+  searchFilters: EntitySearchFilters;
+  graphFilters: KnowledgeGraphFilters;
+  graphRelationTypesFollowAll: boolean;
   message: UiMessage | null;
   error: UiError | null;
   isBusy: boolean;

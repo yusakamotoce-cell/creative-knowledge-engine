@@ -40,4 +40,18 @@ describe("mapErrorToUi", () => {
       detail: "状態を確認して再試行してください。保存済みデータは自動削除していません。",
     });
   });
+
+  it.each([
+    ["INVALID_KNOWLEDGE_EXPORT", "Knowledge JSONを作成できません"],
+    ["FILE_DOWNLOAD_FAILED", "JSONをダウンロードできません"],
+    ["GRAPH_PROJECTION_FAILED", "Knowledge Graphを作成できません"],
+  ])("maps the Step 7 code %s without exposing its cause", (code, title) => {
+    const error = Object.assign(new Error("safe outer"), {
+      code,
+      cause: new Error("secret internal detail"),
+    });
+    const mapped = mapErrorToUi(error);
+    expect(mapped).toMatchObject({ code, title });
+    expect(mapped.detail).not.toContain("secret internal detail");
+  });
 });

@@ -22,7 +22,18 @@ import type { ReviewSession } from "../../core/review/types";
 import type { ImportDocumentInput } from "../../core/import";
 import { importDocument } from "../../core/import";
 import { ApplicationDomainError } from "../../core/application/errors";
+import {
+  createKnowledgeExport,
+  serializeKnowledgeExport,
+} from "../../core/export";
+import {
+  graphEntityTypeLanes,
+  projectKnowledgeGraph,
+} from "../../core/graph";
+import type { KnowledgeGraphFilters } from "../../core/graph";
+import type { EntitySearchFilters } from "../../core/search";
 import type { StorageSnapshot } from "../../core/storage";
+import { createKnowledgeExportFileName } from "../download/fileDownloadAdapter";
 import { mapErrorToUi } from "./errorMapping";
 import {
   getNextProjectAstraStep,
@@ -59,7 +70,12 @@ export interface ApplicationControllerActions {
   acceptRelationshipCandidate(candidateId: string): Promise<void>;
   rejectRelationshipCandidate(candidateId: string): Promise<void>;
   completeAndApplyReviewSession(): Promise<void>;
+  setSearchQuery(query: string): void;
+  setSearchFilters(filters: EntitySearchFilters): void;
+  setGraphFilters(filters: KnowledgeGraphFilters): void;
   selectEntity(id: string | null): void;
+  selectRelationship(id: string | null): void;
+  exportKnowledge(): Promise<void>;
   requestReset(intent: Exclude<ResetIntent, null>): void;
   cancelReset(): void;
   confirmReset(): Promise<void>;
@@ -77,11 +93,41 @@ const initialState: ApplicationControllerState = {
   snapshot: null,
   activeReviewSessionId: null,
   selectedEntityId: null,
+  selectedRelationshipId: null,
+  searchQuery: "",
+  searchFilters: { entityTypes: [...graphEntityTypeLanes], tags: [] },
+  graphFilters: {
+    entityTypes: [...graphEntityTypeLanes],
+    relationTypes: [],
+    includeOrphans: true,
+  },
+  graphRelationTypesFollowAll: true,
   message: null,
   error: null,
   isBusy: false,
   resetIntent: null,
 };
+
+export function graphFiltersForSnapshot(
+  current: Pick<
+    ApplicationControllerState,
+    "graphFilters" | "graphRelationTypesFollowAll"
+  >,
+  snapshot: StorageSnapshot,
+): KnowledgeGraphFilters {
+  const nextRelationTypes = projectKnowledgeGraph(
+    snapshot.knowledge,
+  ).availableRelationTypes;
+  return {
+    ...current.graphFilters,
+    entityTypes: [...current.graphFilters.entityTypes],
+    relationTypes: current.graphRelationTypesFollowAll
+      ? nextRelationTypes
+      : current.graphFilters.relationTypes.filter((relationType) =>
+          nextRelationTypes.includes(relationType),
+        ),
+  };
+}
 
 function requireSnapshot(
   snapshot: StorageSnapshot | null,
@@ -130,6 +176,7 @@ export function useApplicationController(
         ...current,
         status: "ready",
         snapshot: application.snapshot,
+        graphFilters: graphFiltersForSnapshot(current, application.snapshot),
         error: null,
       }));
     } catch (error) {
@@ -477,6 +524,7 @@ export function useApplicationController(
         setState((current) => ({
           ...current,
           snapshot,
+          graphFilters: graphFiltersForSnapshot(current, snapshot),
           activeReviewSessionId: null,
           view: next.kind === "complete" ? "knowledge" : "import",
           message: {
@@ -509,12 +557,42 @@ export function useApplicationController(
           resetIntent: null,
           activeReviewSessionId: null,
           selectedEntityId: null,
+          selectedRelationshipId: null,
+          graphFilters: {
+            ...current.graphFilters,
+            relationTypes: [],
+          },
+          graphRelationTypesFollowAll: true,
           view: "home",
           message: { kind: "success", text: "Workspaceを初期化しました。" },
         }));
         if (intent === "demo") await importProjectAstraSource(snapshot, 0);
       }),
     [dependencies.storage, importProjectAstraSource, runBusy, state.resetIntent],
+  );
+
+  const exportKnowledge = useCallback(
+    () =>
+      runBusy(async () => {
+        const snapshot = requireSnapshot(state.snapshot);
+        const value = createKnowledgeExport(snapshot);
+        const content = serializeKnowledgeExport(value);
+        dependencies.fileDownloadAdapter.downloadText({
+          fileName: createKnowledgeExportFileName(
+            dependencies.exportDateProvider(),
+          ),
+          mediaType: "application/json",
+          content,
+        });
+        setState((current) => ({
+          ...current,
+          message: {
+            kind: "success",
+            text: "Knowledge JSONをダウンロードしました。",
+          },
+        }));
+      }),
+    [dependencies, runBusy, state.snapshot],
   );
 
   const navigate = useCallback((view: AppView) => {
@@ -579,8 +657,42 @@ export function useApplicationController(
     acceptRelationshipCandidate: acceptRelationship,
     rejectRelationshipCandidate: rejectRelationship,
     completeAndApplyReviewSession: completeAndApply,
+    setSearchQuery: (query) =>
+      setState((current) => ({ ...current, searchQuery: query })),
+    setSearchFilters: (filters) =>
+      setState((current) => ({
+        ...current,
+        searchFilters: {
+          ...(filters.entityTypes === undefined
+            ? {}
+            : { entityTypes: [...filters.entityTypes] }),
+          ...(filters.tags === undefined ? {} : { tags: [...filters.tags] }),
+        },
+      })),
+    setGraphFilters: (filters) =>
+      setState((current) => {
+        const availableRelationTypes =
+          current.snapshot === null
+            ? []
+            : projectKnowledgeGraph(current.snapshot.knowledge)
+                .availableRelationTypes;
+        return {
+          ...current,
+          graphFilters: {
+            entityTypes: [...filters.entityTypes],
+            relationTypes: [...filters.relationTypes],
+            includeOrphans: filters.includeOrphans,
+          },
+          graphRelationTypesFollowAll: availableRelationTypes.every(
+            (relationType) => filters.relationTypes.includes(relationType),
+          ),
+        };
+      }),
     selectEntity: (id) =>
       setState((current) => ({ ...current, selectedEntityId: id })),
+    selectRelationship: (id) =>
+      setState((current) => ({ ...current, selectedRelationshipId: id })),
+    exportKnowledge,
     requestReset: (intent) =>
       setState((current) => ({ ...current, resetIntent: intent })),
     cancelReset: () =>

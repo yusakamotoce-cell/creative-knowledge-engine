@@ -23,6 +23,8 @@ export function AppHeader(props: {
           ["home", "Home"],
           ["import", "Import"],
           ["knowledge", "Knowledge"],
+          ["search", "Search"],
+          ["graph", "Graph"],
         ] as const).map(([view, label]) => (
           <button
             key={view}

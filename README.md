@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository currently implements **Step 0–6: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, and the complete browser review workflow**.
+This repository currently implements **Step 0–7: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, the complete browser review workflow, deterministic Search, a read-only Knowledge Graph, and versioned Knowledge JSON Export**.
 
 Implemented:
 
@@ -48,16 +48,21 @@ Implemented:
 - refresh-safe Review progress after every user decision
 - explicit, confirmed Workspace reset through an application service
 - responsive and keyboard-operable Candidate Review presentation
+- synchronous Entity Search across name, aliases, and tags with Search-only normalization
+- deterministic weighted Search ranking with EntityType OR and tag AND filters
+- pure read-only Knowledge Graph projection, filtering, and fixed EntityType-lane layout
+- keyboard-operable SVG Graph nodes plus a Relationship selection list
+- strict Knowledge Export v1 with deterministic two-space JSON serialization
+- injected browser download adapter with deterministic date-based filenames
 - automated domain and application smoke tests
 - architecture decision records
 
-Not implemented through Step 6:
+Not implemented through Step 7:
 
 - IndexedDB adapter and multi-tab synchronization
-- Graph and Search
 - Live AI and serverless functions
 - Context Bundle
-- Step 7 or later functionality
+- Step 8 or later functionality
 
 ## Core boundaries
 
@@ -99,6 +104,18 @@ The four-document Demo is network-free and needs no API key. Refresh at any poin
 
 Arbitrary pasted text and `.txt`, `.md`, `.markdown`, and `.json` files can be submitted through Import. Step 6 intentionally has only Fixture-based extraction, so content without a saved Project Astra extraction result reports `FIXTURE_NOT_FOUND` and is not partially saved.
 
+### Search, Graph, and Export
+
+After registered Knowledge exists:
+
+1. Open **Search** to query Entity name, aliases, and tags. Search applies NFKC, trim, Unicode-whitespace collapse, and lowercase without changing canonical Entity matching. EntityType filters are OR and multiple tag filters are AND.
+2. Open **Graph** for the read-only directed view. EntityType, relationType, and Orphan filters are derived in memory; node positions use deterministic type lanes and are never persisted.
+3. Open **Knowledge**, expand the JSON preview if needed, and choose **Knowledge JSONをダウンロード**. The filename is `creative-knowledge-YYYYMMDD.json`.
+
+Knowledge Export v1 contains the revision and canonical Entity/Relationship Knowledge, including attributes, claims, SourceRefs, and timestamps. It excludes raw Imported Documents, Import Registry, Candidate Bundles, Review Sessions, Review Application history, Local Storage Envelope, UI state, and Insights.
+
+Project Astra provides the repeatable Step 7 check: complete or load its four documents, then verify Search results, the 7-node/5-edge Graph with Quiet Prism as the Orphan, and an Export at revision 4. No API key, network access, or Live AI is required.
+
 ## Quality checks
 
 ```bash
@@ -118,7 +135,7 @@ npm test -- src/data/demo/project-astra
 
 ```text
 src/
-  app/                    Step 6 shell, controller, views, review UI, Demo progress
+  app/                    Step 7 shell, controller, views, download adapter, review UI
   core/
     application/          canonical apply, Review Session save, initialization
     candidates/           Candidate Bundle schemas
@@ -127,6 +144,9 @@ src/
     relationships/        Relationship schema and duplicate key
     review/               two-stage Candidate Review domain
     insights/             pure Knowledge projections
+    search/               Search-only normalization, ranking, and filters
+    graph/                read-only projection, filters, and deterministic layout
+    export/               strict Knowledge Export schema and serialization
     import/               Imported Documents, Registry, Extraction, service
     storage/              Memory/Local adapters and versioned Envelope
     shared/               shared schemas, normalization, IDs, hashing, unions
@@ -144,9 +164,11 @@ Tests are colocated with the domain files they cover. Project Astra contains fou
 
 ## Application and domain boundaries
 
-The Step 0–6 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review, Import, apply, initialization, persistence, reset, and Insights functions remain React-independent.
+The Step 0–7 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review, Import, apply, initialization, persistence, reset, Insights, Search, Graph, and Export functions remain React-independent.
 
 `src/app/compositionRoot.ts` is the only application module that accesses `window.localStorage` or loads the Project Astra Fixture for runtime injection. `useApplicationController` owns operation order, busy protection, saved Snapshot adoption, retries, and error mapping. Views receive state and actions as props.
+
+Browser download APIs are isolated in `src/app/download/fileDownloadAdapter.ts`. Components never create Blobs, object URLs, or temporary anchors directly. Search and Graph are pure consumers of the current Snapshot and do not write query, filters, zoom, coordinates, or projection results to Storage.
 
 ## Candidate Review behavior
 
@@ -183,10 +205,10 @@ The final browser state is 7 Entities, 5 Relationships, revision 4, one Duplicat
 
 ## Manual verification
 
-The repeatable browser, keyboard, persistence, error, 1280 px, and 768 px checks are recorded in `notes/reviews/STEP_6_MANUAL_CHECKLIST.md`.
+The Step 6 workflow checklist remains in `notes/reviews/STEP_6_MANUAL_CHECKLIST.md`. Step 7 Search, Graph, Export, keyboard, downloaded-file, 1280 px, and 768 px checks are recorded in `notes/reviews/STEP_7_MANUAL_CHECKLIST.md`.
 
 ## Deferred integration questions
 
-Search string normalization remains deliberately unresolved because Search is outside Step 6. IndexedDB, Graph, Search, Live AI, serverless functions, Context Bundle, and all Step 7+ behavior are deferred.
+IndexedDB, multi-tab synchronization, Live AI, serverless functions, Context Bundle, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 8+ behavior are deferred.
 
-The Step 6 decisions are recorded in `notes/reviews/STEP_6_IMPLEMENTATION_DECISIONS.md`.
+The Step 7 decisions are recorded in `notes/reviews/STEP_7_IMPLEMENTATION_DECISIONS.md`.

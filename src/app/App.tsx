@@ -8,6 +8,8 @@ import { HomeView } from "./views/HomeView";
 import { ImportView } from "./views/ImportView";
 import { KnowledgeView } from "./views/KnowledgeView";
 import { ReviewView } from "./views/ReviewView";
+import { SearchView } from "./views/SearchView";
+import { GraphView } from "./views/GraphView";
 
 export function App(props: { dependencies: ApplicationDependencies }) {
   const controller = useApplicationController(props.dependencies);
@@ -73,12 +75,31 @@ export function App(props: { dependencies: ApplicationDependencies }) {
         <KnowledgeView
           snapshot={state.snapshot}
           selectedEntityId={state.selectedEntityId}
+          isBusy={state.isBusy}
+          actions={actions}
+        />
+      )}
+      {state.view === "search" && (
+        <SearchView
+          knowledge={state.snapshot.knowledge}
+          query={state.searchQuery}
+          filters={state.searchFilters}
+          selectedEntityId={state.selectedEntityId}
+          actions={actions}
+        />
+      )}
+      {state.view === "graph" && (
+        <GraphView
+          knowledge={state.snapshot.knowledge}
+          filters={state.graphFilters}
+          selectedEntityId={state.selectedEntityId}
+          selectedRelationshipId={state.selectedRelationshipId}
           actions={actions}
         />
       )}
       {state.isBusy && (
         <div className="busy-overlay" role="status" aria-live="polite">
-          保存しています…
+          処理しています…
         </div>
       )}
     </div>
