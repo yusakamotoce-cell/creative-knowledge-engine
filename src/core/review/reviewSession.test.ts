@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 
+import { SequenceIdGenerator } from "../shared/idGenerator";
 import { rejectEntityCandidate } from "./entityReview";
 import {
   advanceToRelationshipReview,
   completeReviewSession,
-  createReviewSession,
+  createReviewSession as createReviewSessionWithId,
 } from "./reviewSession";
 import {
   expectReviewError,
@@ -14,7 +15,15 @@ import {
   makeKnowledge,
   makeRelationship,
   makeRelationshipCandidate,
+  makeReviewSessionDependencies,
 } from "./testSupport";
+import { reviewSessionSchema } from "./types";
+
+function createReviewSession(
+  input: Parameters<typeof createReviewSessionWithId>[0],
+) {
+  return createReviewSessionWithId(input, makeReviewSessionDependencies());
+}
 
 describe("createReviewSession", () => {
   it("creates ordered pending reviews in the entity phase", () => {
@@ -31,6 +40,7 @@ describe("createReviewSession", () => {
     const session = createReviewSession({ bundle, initialKnowledge: makeKnowledge() });
 
     expect(session.phase).toBe("entities");
+    expect(session.id).toBe("review-session-1");
     expect(session.entityReviews.map(({ candidateId }) => candidateId)).toEqual([
       "candidate-2",
       "candidate-1",
@@ -119,6 +129,50 @@ describe("createReviewSession", () => {
 
     expect(bundle).toEqual(originalBundle);
     expect(knowledge).toEqual(originalKnowledge);
+  });
+
+  it("issues a first-class Review Session ID with the required prefix", () => {
+    const calls: string[] = [];
+    const session = createReviewSessionWithId(
+      {
+        bundle: makeBundle({ entities: [], relationships: [] }),
+        initialKnowledge: makeKnowledge(),
+      },
+      {
+        idGenerator: {
+          nextId(prefix) {
+            calls.push(prefix);
+            return "review-session-persistent";
+          },
+        },
+      },
+    );
+
+    expect(session.id).toBe("review-session-persistent");
+    expect(calls).toEqual(["review-session"]);
+  });
+
+  it("propagates the existing fixed ID exhaustion error", () => {
+    expect(() =>
+      createReviewSessionWithId(
+        {
+          bundle: makeBundle({ entities: [], relationships: [] }),
+          initialKnowledge: makeKnowledge(),
+        },
+        { idGenerator: new SequenceIdGenerator([]) },
+      ),
+    ).toThrow("ID_SEQUENCE_EXHAUSTED");
+  });
+
+  it("requires ID in the strict Review Session Schema", () => {
+    const session = createReviewSession({
+      bundle: makeBundle({ entities: [], relationships: [] }),
+      initialKnowledge: makeKnowledge(),
+    });
+    const withoutId: Partial<typeof session> = { ...session };
+    delete withoutId.id;
+
+    expect(reviewSessionSchema.safeParse(withoutId).success).toBe(false);
   });
 });
 

@@ -1,60 +1,94 @@
-import type {
-  EntityCandidate,
-  RelationshipCandidate,
+import { z } from "zod";
+
+import {
+  entityCandidateSchema,
+  relationshipCandidateSchema,
 } from "../candidates/candidate";
-import type { KnowledgeState } from "../knowledge/knowledgeState";
+import { knowledgeStateSchema } from "../knowledge/knowledgeState";
+import { nonEmptyTrimmedStringSchema } from "../shared/schemas";
 
-export type ReviewPhase = "entities" | "relationships" | "complete";
+export const reviewPhaseSchema = z.enum([
+  "entities",
+  "relationships",
+  "complete",
+]);
 
-export type EntityReviewStatus =
-  | "pending"
-  | "accepted"
-  | "merged"
-  | "rejected";
+export type ReviewPhase = z.infer<typeof reviewPhaseSchema>;
 
-export type RelationshipReviewStatus =
-  | "pending"
-  | "accepted"
-  | "merged"
-  | "blocked"
-  | "rejected";
+export const entityReviewStatusSchema = z.enum([
+  "pending",
+  "accepted",
+  "merged",
+  "rejected",
+]);
 
-export interface EntityReviewRecord {
-  candidateId: string;
-  candidate: EntityCandidate;
-  status: EntityReviewStatus;
-  registeredEntityId: string | null;
-  duplicateEntityIds: string[];
-}
+export type EntityReviewStatus = z.infer<typeof entityReviewStatusSchema>;
 
-export type RelationshipBlockedReason =
-  | "unresolved_from"
-  | "unresolved_to"
-  | "unresolved_both"
-  | "ambiguous_from"
-  | "ambiguous_to"
-  | "ambiguous_both"
-  | "references_rejected_entity";
+export const relationshipReviewStatusSchema = z.enum([
+  "pending",
+  "accepted",
+  "merged",
+  "blocked",
+  "rejected",
+]);
+
+export type RelationshipReviewStatus = z.infer<
+  typeof relationshipReviewStatusSchema
+>;
+
+export const entityReviewRecordSchema = z.strictObject({
+  candidateId: nonEmptyTrimmedStringSchema,
+  candidate: entityCandidateSchema,
+  status: entityReviewStatusSchema,
+  registeredEntityId: nonEmptyTrimmedStringSchema.nullable(),
+  duplicateEntityIds: z.array(nonEmptyTrimmedStringSchema),
+});
+
+export type EntityReviewRecord = z.infer<typeof entityReviewRecordSchema>;
+
+export const relationshipBlockedReasonSchema = z.enum([
+  "unresolved_from",
+  "unresolved_to",
+  "unresolved_both",
+  "ambiguous_from",
+  "ambiguous_to",
+  "ambiguous_both",
+  "references_rejected_entity",
+]);
+
+export type RelationshipBlockedReason = z.infer<
+  typeof relationshipBlockedReasonSchema
+>;
 
 export type RelationshipReviewRecommendation = "reject" | null;
 
-export interface RelationshipReviewRecord {
-  candidateId: string;
-  candidate: RelationshipCandidate;
-  status: RelationshipReviewStatus;
-  resolvedFromEntityId: string | null;
-  resolvedToEntityId: string | null;
-  blockedReason: RelationshipBlockedReason | null;
-  recommendation: RelationshipReviewRecommendation;
-  registeredRelationshipId: string | null;
-}
+export const relationshipReviewRecordSchema = z.strictObject({
+  candidateId: nonEmptyTrimmedStringSchema,
+  candidate: relationshipCandidateSchema,
+  status: relationshipReviewStatusSchema,
+  resolvedFromEntityId: nonEmptyTrimmedStringSchema.nullable(),
+  resolvedToEntityId: nonEmptyTrimmedStringSchema.nullable(),
+  blockedReason: relationshipBlockedReasonSchema.nullable(),
+  recommendation: z.literal("reject").nullable(),
+  registeredRelationshipId: nonEmptyTrimmedStringSchema.nullable(),
+});
 
-export interface ReviewSession {
-  schemaVersion: 1;
-  documentId: string;
-  phase: ReviewPhase;
-  knowledge: KnowledgeState;
-  entityReviews: EntityReviewRecord[];
-  relationshipReviews: RelationshipReviewRecord[];
-  candidateIdToRegisteredEntityId: Record<string, string>;
-}
+export type RelationshipReviewRecord = z.infer<
+  typeof relationshipReviewRecordSchema
+>;
+
+export const reviewSessionSchema = z.strictObject({
+  id: nonEmptyTrimmedStringSchema,
+  schemaVersion: z.literal(1),
+  documentId: nonEmptyTrimmedStringSchema,
+  phase: reviewPhaseSchema,
+  knowledge: knowledgeStateSchema,
+  entityReviews: z.array(entityReviewRecordSchema),
+  relationshipReviews: z.array(relationshipReviewRecordSchema),
+  candidateIdToRegisteredEntityId: z.record(
+    z.string(),
+    nonEmptyTrimmedStringSchema,
+  ),
+});
+
+export type ReviewSession = z.infer<typeof reviewSessionSchema>;

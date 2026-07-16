@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { SequenceClock } from "../shared/clock";
 import { mergeEntityCandidate, rejectEntityCandidate } from "./entityReview";
 import { resolveEntityReference } from "./referenceResolution";
-import { createReviewSession } from "./reviewSession";
 import {
+  createTestReviewSession as createReviewSession,
   expectReviewError,
   makeBundle,
   makeEntity,

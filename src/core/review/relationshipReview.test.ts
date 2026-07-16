@@ -10,9 +10,9 @@ import {
 import {
   advanceToRelationshipReview,
   completeReviewSession,
-  createReviewSession,
 } from "./reviewSession";
 import {
+  createTestReviewSession as createReviewSession,
   expectReviewError,
   makeBundle,
   makeEntity,

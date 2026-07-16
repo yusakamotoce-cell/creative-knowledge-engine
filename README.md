@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository currently implements **Step 0–2: domain contracts and Candidate Review**.
+This repository currently implements **Step 0–3: domain contracts, Candidate Review, and Import/Storage boundaries**.
 
 Implemented:
 
@@ -27,20 +27,26 @@ Implemented:
 - manual Relationship endpoint resolution
 - Relationship Accept, duplicate-key consolidation, and Reject operations
 - injectable production and sequence Clocks
+- strict Imported Document contracts for text, Markdown, JSON, and pasted text
+- raw-content UTF-8 SHA-256 hashing and idempotent Import Registry
+- untrusted Extraction Adapter boundary and synthetic Fixture Adapter
+- strict Storage Snapshot contract and immutable Memory Storage Adapter
+- atomic Import Service from source content to a stored Review Session
+- first-class persistent Review Session IDs
 - automated domain and application smoke tests
 - architecture decision records
 
-Not implemented through Step 2:
+Not implemented through Step 3:
 
 - Project Astra fixture files
 - Candidate Review UI
-- Import UI or parsing flow
-- Storage Adapter implementation
+- Import and Candidate Review UI
+- localStorage and IndexedDB adapters
 - Knowledge Insights screens
 - Graph and Search
 - Live AI and serverless functions
 - Context Bundle
-- Step 3 or later functionality
+- Step 4 or later functionality
 
 ## Core boundaries
 
@@ -90,9 +96,9 @@ src/
     relationships/        Relationship schema and duplicate key
     review/               two-stage Candidate Review domain
     insights/             reserved for a later step
-    import/               reserved for a later step
-    storage/              reserved for a later step
-    shared/               shared schemas, normalization, IDs, unions
+    import/               Imported Documents, Registry, Extraction, service
+    storage/              strict snapshot and Memory Adapter
+    shared/               shared schemas, normalization, IDs, hashing, unions
   data/
     demo/                  reserved for frozen Project Astra fixtures
   test/                    shared test setup
@@ -103,11 +109,11 @@ notes/
   submission/              future Build Week submission material
 ```
 
-Tests are colocated with the domain files they cover. No Project Astra fixture data is generated through Step 2.
+Tests are colocated with the domain files they cover. No Project Astra fixture data is generated through Step 3.
 
 ## Domain entry point
 
-The Step 0–2 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review functions use an injected Clock and ID generator and do not depend on React or Storage.
+The Step 0–3 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review and Import functions use injected Clock, ID, hashing, extraction, and storage dependencies.
 
 ## Candidate Review behavior
 
@@ -116,8 +122,16 @@ The Step 0–2 public domain exports are available from `src/core/index.ts`. Rea
 - A blocked Relationship requires manual endpoint resolution or explicit Reject; a reject recommendation never auto-rejects it.
 - Candidate attributes use all distinct Candidate SourceRefs for provenance.
 
+## Import and Storage behavior
+
+- The raw content string alone is hashed with SHA-256; BOM, whitespace, JSON formatting, and line-ending differences are preserved.
+- An existing content hash returns the first Imported Document without rerunning Extraction or saving again.
+- Extraction Adapter output is always treated as untrusted and passed through the strict Candidate Bundle Schema.
+- A successful first import stores the Document, Registry entry, and Review Session in one snapshot while leaving root Knowledge unchanged.
+- Step 3 includes Memory Storage only. It does not access localStorage or IndexedDB.
+
 ## Deferred integration questions
 
-Search string normalization remains deliberately unresolved because Search is outside Step 2. Candidate Review UI, durable session persistence, Project Astra Fixture generation, and all Step 3+ behavior are also deferred.
+Search string normalization remains deliberately unresolved because Search is outside Step 3. Browser persistence, product UI, Project Astra Fixture generation, and all Step 4+ behavior are also deferred.
 
-The Step 2 decisions and Project Astra carryover are recorded in `notes/reviews/STEP_2_IMPLEMENTATION_DECISIONS.md`.
+The Step 3 decisions and Project Astra carryover are recorded in `notes/reviews/STEP_3_IMPLEMENTATION_DECISIONS.md`.

@@ -6,8 +6,11 @@ import type {
 import type { Entity } from "../entities/entity";
 import type { KnowledgeState } from "../knowledge/knowledgeState";
 import type { Relationship } from "../relationships/relationship";
+import { SequenceIdGenerator } from "../shared/idGenerator";
 import type { SourceRef } from "../shared/sourceRef";
 import { ReviewDomainError, type ReviewErrorCode } from "./errors";
+import { createReviewSession } from "./reviewSession";
+import type { ReviewSession } from "./types";
 
 export const timestampA = "2026-07-16T00:00:00.000Z";
 export const timestampB = "2026-07-16T01:00:00.000Z";
@@ -23,6 +26,19 @@ export const sourceB: SourceRef = {
   fileName: "two.md",
   excerpt: "source two",
 };
+
+export function makeReviewSessionDependencies(
+  id = "review-session-1",
+): { idGenerator: SequenceIdGenerator } {
+  return { idGenerator: new SequenceIdGenerator([id]) };
+}
+
+export function createTestReviewSession(input: {
+  bundle: CandidateBundle;
+  initialKnowledge: KnowledgeState;
+}, id = "review-session-1"): ReviewSession {
+  return createReviewSession(input, makeReviewSessionDependencies(id));
+}
 
 export function makeEntity(overrides: Partial<Entity> = {}): Entity {
   return {

@@ -12,8 +12,8 @@ import {
   mergeEntityCandidate,
   rejectEntityCandidate,
 } from "./entityReview";
-import { createReviewSession } from "./reviewSession";
 import {
+  createTestReviewSession as createReviewSession,
   expectReviewError,
   makeBundle,
   makeEntity,

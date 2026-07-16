@@ -4,7 +4,8 @@ import {
   knowledgeStateSchema,
   type KnowledgeState,
 } from "../knowledge/knowledgeState";
-import type { ReviewSession } from "./types";
+import type { IdGenerator } from "../shared/idGenerator";
+import { reviewSessionSchema, type ReviewSession } from "./types";
 import { ReviewDomainError } from "./errors";
 import { resolveRelationshipReviewRecord } from "./relationshipReview";
 import { requirePhase } from "./sessionUtils";
@@ -30,6 +31,8 @@ function requireUniqueValues(
 export function createReviewSession(input: {
   bundle: CandidateBundle;
   initialKnowledge: KnowledgeState;
+}, dependencies: {
+  idGenerator: IdGenerator;
 }): ReviewSession {
   const bundle = candidateBundleSchema.parse(input.bundle);
   const knowledge = knowledgeStateSchema.parse(input.initialKnowledge);
@@ -64,7 +67,8 @@ export function createReviewSession(input: {
 
   const nameIndex = buildEntityNameIndex(knowledge.entities);
 
-  return {
+  return reviewSessionSchema.parse({
+    id: dependencies.idGenerator.nextId("review-session"),
     schemaVersion: 1,
     documentId: bundle.documentId,
     phase: "entities",
@@ -87,7 +91,7 @@ export function createReviewSession(input: {
       registeredRelationshipId: null,
     })),
     candidateIdToRegisteredEntityId: {},
-  };
+  });
 }
 
 export function advanceToRelationshipReview(
