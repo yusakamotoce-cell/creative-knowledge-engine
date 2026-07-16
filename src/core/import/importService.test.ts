@@ -19,6 +19,7 @@ import {
   importedAt,
   makeCandidateBundle,
   makeImportedDocument,
+  makeStorageSnapshot,
 } from "./testSupport";
 
 class CountingIdGenerator implements IdGenerator {
@@ -130,6 +131,9 @@ describe("Import Service success", () => {
         importedAt,
       });
       expect(result.reviewSession.id).toBe("review-session-1");
+      expect(result.reviewSession.baseKnowledgeRevision).toBe(0);
+      expect(result.snapshot.knowledgeRevision).toBe(0);
+      expect(result.snapshot.reviewApplications).toEqual([]);
     },
   );
 
@@ -184,6 +188,48 @@ describe("Import Service success", () => {
       expect(result.candidateBundle.documentId).toBe(result.document.id);
     }
   });
+
+  it("records a current revision of two without changing revision history", async () => {
+    const initial = makeStorageSnapshot();
+    const secondPriorSession = {
+      ...structuredClone(initial.reviewSessions[0]!),
+      id: "review-session-prior-2",
+    };
+    initial.reviewSessions.push(secondPriorSession);
+    initial.knowledgeRevision = 2;
+    initial.reviewApplications = [
+      {
+        reviewSessionId: initial.reviewSessions[0]!.id,
+        appliedAt: importedAt,
+        fromKnowledgeRevision: 0,
+        toKnowledgeRevision: 1,
+      },
+      {
+        reviewSessionId: secondPriorSession.id,
+        appliedAt: importedAt,
+        fromKnowledgeRevision: 1,
+        toKnowledgeRevision: 2,
+      },
+    ];
+    const dependencies = makeDependencies(initial);
+    dependencies.hasher = new FixedHasher("b".repeat(64));
+    dependencies.idGenerator = new CountingIdGenerator([
+      "document-2",
+      "review-session-new",
+    ]);
+    dependencies.extractionAdapter = new CountingExtractionAdapter(
+      makeCandidateBundle("document-2"),
+    );
+    const result = await importDocument(makeInput({ content: "new" }), dependencies);
+
+    expect(result.status).toBe("imported");
+    if (result.status !== "imported") return;
+    expect(result.reviewSession.baseKnowledgeRevision).toBe(2);
+    expect(result.snapshot.knowledgeRevision).toBe(2);
+    expect(result.snapshot.reviewApplications).toEqual(
+      initial.reviewApplications,
+    );
+  });
 });
 
 describe("Import Service re-import idempotency", () => {
@@ -204,6 +250,8 @@ describe("Import Service re-import idempotency", () => {
     if (first.status !== "imported" || second.status !== "already_imported") return;
     expect(second.existingDocument).toEqual(first.document);
     expect(second.existingReviewSession).toEqual(first.reviewSession);
+    expect(second.snapshot.knowledgeRevision).toBe(0);
+    expect(second.snapshot.reviewApplications).toEqual([]);
     expect(dependencies.extractionAdapter.calls).toBe(1);
     expect(dependencies.idGenerator.prefixes).toEqual([
       "document",
@@ -218,7 +266,9 @@ describe("Import Service re-import idempotency", () => {
     const document = makeImportedDocument();
     const snapshot: StorageSnapshot = {
       knowledge: { entities: [], relationships: [] },
+      knowledgeRevision: 0,
       reviewSessions: [],
+      reviewApplications: [],
       importedDocuments: [document],
       importRegistry: {
         entries: [{

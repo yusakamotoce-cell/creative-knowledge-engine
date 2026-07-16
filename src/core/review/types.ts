@@ -5,6 +5,7 @@ import {
   relationshipCandidateSchema,
 } from "../candidates/candidate";
 import { knowledgeStateSchema } from "../knowledge/knowledgeState";
+import { knowledgeRevisionSchema } from "../application/types";
 import { nonEmptyTrimmedStringSchema } from "../shared/schemas";
 
 export const reviewPhaseSchema = z.enum([
@@ -81,6 +82,7 @@ export const reviewSessionSchema = z.strictObject({
   id: nonEmptyTrimmedStringSchema,
   schemaVersion: z.literal(1),
   documentId: nonEmptyTrimmedStringSchema,
+  baseKnowledgeRevision: knowledgeRevisionSchema,
   phase: reviewPhaseSchema,
   knowledge: knowledgeStateSchema,
   entityReviews: z.array(entityReviewRecordSchema),

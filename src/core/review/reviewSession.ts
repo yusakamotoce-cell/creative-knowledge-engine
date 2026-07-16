@@ -31,6 +31,7 @@ function requireUniqueValues(
 export function createReviewSession(input: {
   bundle: CandidateBundle;
   initialKnowledge: KnowledgeState;
+  baseKnowledgeRevision: number;
 }, dependencies: {
   idGenerator: IdGenerator;
 }): ReviewSession {
@@ -71,6 +72,7 @@ export function createReviewSession(input: {
     id: dependencies.idGenerator.nextId("review-session"),
     schemaVersion: 1,
     documentId: bundle.documentId,
+    baseKnowledgeRevision: input.baseKnowledgeRevision,
     phase: "entities",
     knowledge,
     entityReviews: bundle.entities.map((candidate) => ({

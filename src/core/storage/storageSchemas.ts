@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+import {
+  knowledgeRevisionSchema,
+  reviewApplicationRecordStorageSchema,
+} from "../application/types";
 import { importRegistrySchema } from "../import/importRegistry";
 import { importedDocumentSchema } from "../import/importedDocument";
 import {
@@ -13,7 +17,9 @@ import type { StorageSnapshot } from "./storageAdapter";
 
 export const storageSnapshotSchema = z.strictObject({
   knowledge: knowledgeStateSchema,
+  knowledgeRevision: knowledgeRevisionSchema,
   reviewSessions: z.array(reviewSessionSchema),
+  reviewApplications: z.array(reviewApplicationRecordStorageSchema),
   importedDocuments: z.array(importedDocumentSchema),
   importRegistry: importRegistrySchema,
 });
@@ -90,6 +96,10 @@ export function parseStorageSnapshot(input: unknown): StorageSnapshot {
     snapshot.importRegistry.entries.map((entry) => entry.contentSha256),
     "DUPLICATE_IMPORT_HASH",
   );
+  requireUnique(
+    snapshot.reviewApplications.map((application) => application.reviewSessionId),
+    "DUPLICATE_REVIEW_APPLICATION",
+  );
 
   const documentsById = new Map(
     snapshot.importedDocuments.map((document) => [document.id, document]),
@@ -110,6 +120,49 @@ export function parseStorageSnapshot(input: unknown): StorageSnapshot {
     )
   ) {
     throw new StorageDomainError("REVIEW_SESSION_DANGLING_DOCUMENT");
+  }
+
+  const reviewSessionIds = new Set(
+    snapshot.reviewSessions.map((session) => session.id),
+  );
+  if (
+    snapshot.reviewApplications.some(
+      (application) => !reviewSessionIds.has(application.reviewSessionId),
+    )
+  ) {
+    throw new StorageDomainError("REVIEW_APPLICATION_DANGLING_SESSION");
+  }
+
+  for (const application of snapshot.reviewApplications) {
+    if (
+      application.toKnowledgeRevision !==
+      application.fromKnowledgeRevision + 1
+    ) {
+      throw new StorageDomainError("INVALID_REVIEW_APPLICATION_REVISION");
+    }
+  }
+
+  for (let index = 1; index < snapshot.reviewApplications.length; index += 1) {
+    const previous = snapshot.reviewApplications[index - 1];
+    const current = snapshot.reviewApplications[index];
+    if (
+      previous === undefined ||
+      current === undefined ||
+      previous.toKnowledgeRevision !== current.fromKnowledgeRevision
+    ) {
+      throw new StorageDomainError("INVALID_REVIEW_APPLICATION_REVISION");
+    }
+  }
+
+  const finalApplication = snapshot.reviewApplications.at(-1);
+  if (finalApplication === undefined) {
+    if (snapshot.knowledgeRevision !== 0) {
+      throw new StorageDomainError("INVALID_REVIEW_APPLICATION_REVISION");
+    }
+  } else if (
+    finalApplication.toKnowledgeRevision !== snapshot.knowledgeRevision
+  ) {
+    throw new StorageDomainError("INVALID_REVIEW_APPLICATION_REVISION");
   }
 
   validateKnowledgeIntegrity(snapshot.knowledge);

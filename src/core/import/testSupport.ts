@@ -40,13 +40,16 @@ export function makeStorageSnapshot(): StorageSnapshot {
     {
       bundle: makeCandidateBundle(document.id),
       initialKnowledge: { entities: [], relationships: [] },
+      baseKnowledgeRevision: 0,
     },
     { idGenerator: new SequenceIdGenerator(["review-session-1"]) },
   );
 
   return {
     knowledge: { entities: [], relationships: [] },
+    knowledgeRevision: 0,
     reviewSessions: [reviewSession],
+    reviewApplications: [],
     importedDocuments: [document],
     importRegistry: {
       entries: [

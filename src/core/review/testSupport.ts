@@ -37,7 +37,10 @@ export function createTestReviewSession(input: {
   bundle: CandidateBundle;
   initialKnowledge: KnowledgeState;
 }, id = "review-session-1"): ReviewSession {
-  return createReviewSession(input, makeReviewSessionDependencies(id));
+  return createReviewSession(
+    { ...input, baseKnowledgeRevision: 0 },
+    makeReviewSessionDependencies(id),
+  );
 }
 
 export function makeEntity(overrides: Partial<Entity> = {}): Entity {

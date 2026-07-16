@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository currently implements **Step 0–3: domain contracts, Candidate Review, and Import/Storage boundaries**.
+This repository currently implements **Step 0–4: domain contracts, Candidate Review, Import, canonical application, and browser persistence boundaries**.
 
 Implemented:
 
@@ -33,20 +33,25 @@ Implemented:
 - strict Storage Snapshot contract and immutable Memory Storage Adapter
 - atomic Import Service from source content to a stored Review Session
 - first-class persistent Review Session IDs
+- canonical Knowledge revision and Review Session base revision contracts
+- idempotent application of completed Review Sessions to canonical Knowledge
+- Review Application history with stale-Session conflict prevention
+- strict versioned Storage Envelope and migration decoder boundary
+- injected Local Storage Adapter and safe application initialization
 - automated domain and application smoke tests
 - architecture decision records
 
-Not implemented through Step 3:
+Not implemented through Step 4:
 
 - Project Astra fixture files
 - Candidate Review UI
 - Import and Candidate Review UI
-- localStorage and IndexedDB adapters
+- IndexedDB adapter and multi-tab synchronization
 - Knowledge Insights screens
 - Graph and Search
 - Live AI and serverless functions
 - Context Bundle
-- Step 4 or later functionality
+- Step 5 or later functionality
 
 ## Core boundaries
 
@@ -90,6 +95,7 @@ npm run build
 src/
   app/                    minimal Step 0–1 application shell
   core/
+    application/          canonical apply and startup initialization
     candidates/           Candidate Bundle schemas
     entities/             Entity, AttributeRecord, Duplicate logic
     knowledge/            immutable in-memory KnowledgeState
@@ -97,7 +103,7 @@ src/
     review/               two-stage Candidate Review domain
     insights/             reserved for a later step
     import/               Imported Documents, Registry, Extraction, service
-    storage/              strict snapshot and Memory Adapter
+    storage/              Memory/Local adapters and versioned Envelope
     shared/               shared schemas, normalization, IDs, hashing, unions
   data/
     demo/                  reserved for frozen Project Astra fixtures
@@ -109,11 +115,11 @@ notes/
   submission/              future Build Week submission material
 ```
 
-Tests are colocated with the domain files they cover. No Project Astra fixture data is generated through Step 3.
+Tests are colocated with the domain files they cover. No Project Astra fixture data is generated through Step 4.
 
 ## Domain entry point
 
-The Step 0–3 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review and Import functions use injected Clock, ID, hashing, extraction, and storage dependencies.
+The Step 0–4 public domain exports are available from `src/core/index.ts`. React components do not own or implement domain behavior. Review, Import, apply, initialization, and persistence functions use injected dependencies.
 
 ## Candidate Review behavior
 
@@ -128,10 +134,15 @@ The Step 0–3 public domain exports are available from `src/core/index.ts`. Rea
 - An existing content hash returns the first Imported Document without rerunning Extraction or saving again.
 - Extraction Adapter output is always treated as untrusted and passed through the strict Candidate Bundle Schema.
 - A successful first import stores the Document, Registry entry, and Review Session in one snapshot while leaving root Knowledge unchanged.
-- Step 3 includes Memory Storage only. It does not access localStorage or IndexedDB.
+- Completed Sessions replace canonical Knowledge only through the application service.
+- A stale Session is rejected when its base revision differs from current Knowledge revision.
+- Reapplying one Session returns its existing application record without saving again.
+- Memory and injected Local Storage Adapters share the same strict Snapshot contract.
+- Local persistence uses a versioned Envelope and never silently resets corrupt data.
+- IndexedDB is not implemented.
 
 ## Deferred integration questions
 
-Search string normalization remains deliberately unresolved because Search is outside Step 3. Browser persistence, product UI, Project Astra Fixture generation, and all Step 4+ behavior are also deferred.
+Search string normalization remains deliberately unresolved because Search is outside Step 4. Product UI, IndexedDB, Project Astra Fixture generation, and all Step 5+ behavior are also deferred.
 
-The Step 3 decisions and Project Astra carryover are recorded in `notes/reviews/STEP_3_IMPLEMENTATION_DECISIONS.md`.
+The Step 4 decisions and Project Astra carryover are recorded in `notes/reviews/STEP_4_IMPLEMENTATION_DECISIONS.md`.

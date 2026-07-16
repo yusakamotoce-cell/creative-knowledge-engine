@@ -89,11 +89,12 @@ export async function importDocument(
     {
       bundle: candidateBundle,
       initialKnowledge: snapshot.knowledge,
+      baseKnowledgeRevision: snapshot.knowledgeRevision,
     },
     { idGenerator: dependencies.idGenerator },
   );
   const nextSnapshot = {
-    knowledge: snapshot.knowledge,
+    ...snapshot,
     reviewSessions: [...snapshot.reviewSessions, reviewSession],
     importedDocuments: [...snapshot.importedDocuments, document],
     importRegistry: registerImportedDocument(snapshot.importRegistry, document),

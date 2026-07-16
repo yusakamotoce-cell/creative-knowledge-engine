@@ -20,9 +20,15 @@ import {
 import { reviewSessionSchema } from "./types";
 
 function createReviewSession(
-  input: Parameters<typeof createReviewSessionWithId>[0],
+  input: Omit<
+    Parameters<typeof createReviewSessionWithId>[0],
+    "baseKnowledgeRevision"
+  >,
 ) {
-  return createReviewSessionWithId(input, makeReviewSessionDependencies());
+  return createReviewSessionWithId(
+    { ...input, baseKnowledgeRevision: 0 },
+    makeReviewSessionDependencies(),
+  );
 }
 
 describe("createReviewSession", () => {
@@ -41,6 +47,7 @@ describe("createReviewSession", () => {
 
     expect(session.phase).toBe("entities");
     expect(session.id).toBe("review-session-1");
+    expect(session.baseKnowledgeRevision).toBe(0);
     expect(session.entityReviews.map(({ candidateId }) => candidateId)).toEqual([
       "candidate-2",
       "candidate-1",
@@ -137,6 +144,7 @@ describe("createReviewSession", () => {
       {
         bundle: makeBundle({ entities: [], relationships: [] }),
         initialKnowledge: makeKnowledge(),
+        baseKnowledgeRevision: 0,
       },
       {
         idGenerator: {
@@ -158,6 +166,7 @@ describe("createReviewSession", () => {
         {
           bundle: makeBundle({ entities: [], relationships: [] }),
           initialKnowledge: makeKnowledge(),
+          baseKnowledgeRevision: 0,
         },
         { idGenerator: new SequenceIdGenerator([]) },
       ),
@@ -173,6 +182,26 @@ describe("createReviewSession", () => {
     delete withoutId.id;
 
     expect(reviewSessionSchema.safeParse(withoutId).success).toBe(false);
+  });
+
+  it("requires and preserves baseKnowledgeRevision through completion", () => {
+    const initial = createReviewSessionWithId(
+      {
+        bundle: makeBundle({ entities: [], relationships: [] }),
+        initialKnowledge: makeKnowledge(),
+        baseKnowledgeRevision: 2,
+      },
+      makeReviewSessionDependencies(),
+    );
+    const complete = completeReviewSession(
+      advanceToRelationshipReview(initial),
+    );
+    const withoutBase: Partial<typeof complete> = { ...complete };
+    delete withoutBase.baseKnowledgeRevision;
+
+    expect(initial.baseKnowledgeRevision).toBe(2);
+    expect(complete.baseKnowledgeRevision).toBe(2);
+    expect(reviewSessionSchema.safeParse(withoutBase).success).toBe(false);
   });
 });
 
