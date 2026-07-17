@@ -1,11 +1,11 @@
-import type { FetchLike } from "./contracts";
+import type { ImportedDocument } from "../../core/import/importedDocument.js";
+import type { FetchLike } from "./contracts.js";
 import { providerCandidateBundleJsonSchema } from "./providerCandidateBundleJsonSchema.js";
 import { LiveExtractionServerError } from "./errors.js";
 import {
   buildLiveExtractionUserContent,
   LIVE_EXTRACTION_DEVELOPER_PROMPT,
 } from "./prompt.js";
-import type { ImportedDocument } from "../../core/import/importedDocument";
 
 export const OPENAI_RESPONSES_API_URL =
   "https://api.openai.com/v1/responses";

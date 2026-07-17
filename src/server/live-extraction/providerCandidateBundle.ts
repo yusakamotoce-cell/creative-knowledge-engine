@@ -1,17 +1,17 @@
 import { z } from "zod";
 
-import {
-  type CandidateBundle,
-  type EntityReference,
-} from "../../core/candidates/candidate";
+import type {
+  CandidateBundle,
+  EntityReference,
+} from "../../core/candidates/candidate.js";
 import { entityTypeSchema } from "../../core/entities/entity.js";
+import { CANDIDATE_BUNDLE_LIMITS } from "../../core/import/candidateBundleGrounding.js";
 import { normalizeAttributeKey } from "../../core/shared/normalization.js";
 import {
   nonEmptyTrimmedStringSchema,
   scalarValueSchema,
-  type ScalarValue,
 } from "../../core/shared/schemas.js";
-import { CANDIDATE_BUNDLE_LIMITS } from "../../core/import/candidateBundleGrounding.js";
+import type { ScalarValue } from "../../core/shared/schemas.js";
 
 const providerIdentifierSchema = nonEmptyTrimmedStringSchema.max(
   CANDIDATE_BUNDLE_LIMITS.identifierCharacters,

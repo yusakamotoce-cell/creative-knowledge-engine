@@ -1,4 +1,4 @@
-import type { ImportedDocument } from "../../core/import/importedDocument";
+import type { ImportedDocument } from "../../core/import/importedDocument.js";
 
 export const LIVE_EXTRACTION_PROMPT_VERSION =
   "creative-knowledge-candidate-extraction-v1";

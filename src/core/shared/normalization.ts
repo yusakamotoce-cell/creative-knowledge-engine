@@ -1,4 +1,4 @@
-import type { ScalarValue } from "./schemas";
+import type { ScalarValue } from "./schemas.js";
 
 const WHITESPACE_PATTERN = /\s+/gu;
 

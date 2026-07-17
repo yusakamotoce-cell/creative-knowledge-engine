@@ -36,18 +36,7 @@ function resolveModule(fromPath, specifier) {
   return candidates.find((candidate) => existsSync(candidate) && statSync(candidate).isFile());
 }
 
-function isRuntimeImport(statement) {
-  const clause = statement.importClause;
-  if (clause === undefined) return true;
-  if (clause.isTypeOnly) return false;
-  if (clause.name !== undefined) return true;
-  const bindings = clause.namedBindings;
-  if (bindings === undefined) return false;
-  if (ts.isNamespaceImport(bindings)) return true;
-  return bindings.elements.some((element) => !element.isTypeOnly);
-}
-
-function runtimeRelativeImports(source, filePath) {
+function moduleRelativeImports(source, filePath) {
   const sourceFile = ts.createSourceFile(
     filePath,
     source,
@@ -61,7 +50,6 @@ function runtimeRelativeImports(source, filePath) {
     if (
       ts.isImportDeclaration(statement) &&
       ts.isStringLiteral(statement.moduleSpecifier) &&
-      isRuntimeImport(statement) &&
       statement.moduleSpecifier.text.startsWith(".")
     ) {
       specifiers.push(statement.moduleSpecifier.text);
@@ -70,18 +58,21 @@ function runtimeRelativeImports(source, filePath) {
       ts.isExportDeclaration(statement) &&
       statement.moduleSpecifier !== undefined &&
       ts.isStringLiteral(statement.moduleSpecifier) &&
-      !statement.isTypeOnly &&
       statement.moduleSpecifier.text.startsWith(".")
     ) {
-      const hasRuntimeExport =
-        statement.exportClause === undefined ||
-        !ts.isNamedExports(statement.exportClause) ||
-        statement.exportClause.elements.some((element) => !element.isTypeOnly);
-      if (hasRuntimeExport) specifiers.push(statement.moduleSpecifier.text);
+      specifiers.push(statement.moduleSpecifier.text);
     }
   }
 
   const visit = (node) => {
+    if (
+      ts.isImportTypeNode(node) &&
+      ts.isLiteralTypeNode(node.argument) &&
+      ts.isStringLiteral(node.argument.literal) &&
+      node.argument.literal.text.startsWith(".")
+    ) {
+      specifiers.push(node.argument.literal.text);
+    }
     if (
       ts.isCallExpression(node) &&
       node.expression.kind === ts.SyntaxKind.ImportKeyword &&
@@ -98,7 +89,35 @@ function runtimeRelativeImports(source, filePath) {
   return specifiers;
 }
 
-function runtimeModuleGraph(entry) {
+function inlineTypeImportSpecifiers(source, filePath) {
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const specifiers = [];
+
+  for (const statement of sourceFile.statements) {
+    if (
+      ts.isImportDeclaration(statement) &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      statement.moduleSpecifier.text.startsWith(".") &&
+      statement.importClause?.namedBindings !== undefined &&
+      ts.isNamedImports(statement.importClause.namedBindings) &&
+      statement.importClause.namedBindings.elements.some(
+        (element) => element.isTypeOnly,
+      )
+    ) {
+      specifiers.push(statement.moduleSpecifier.text);
+    }
+  }
+
+  return specifiers;
+}
+
+function moduleGraph(entry) {
   const files = new Set();
   const edges = [];
   const pending = [entry];
@@ -107,7 +126,7 @@ function runtimeModuleGraph(entry) {
     if (filePath === undefined || files.has(filePath)) continue;
     files.add(filePath);
     const source = readFileSync(filePath, "utf8");
-    for (const specifier of runtimeRelativeImports(source, filePath)) {
+    for (const specifier of moduleRelativeImports(source, filePath)) {
       const dependency = resolveModule(filePath, specifier);
       edges.push({ filePath, specifier, dependency });
       if (dependency !== undefined) pending.push(dependency);
@@ -167,9 +186,10 @@ describe("Vercel adapter boundary", () => {
     },
   );
 
-  it("keeps the complete extraction runtime graph ESM-explicit and barrel-free", () => {
-    const graph = runtimeModuleGraph(resolve(workspace, "api", "extract.ts"));
+  it("keeps every extraction import edge ESM-explicit and barrel-free", () => {
+    const graph = moduleGraph(resolve(workspace, "api", "extract.ts"));
     expect(graph.files).toHaveLength(20);
+    expect(graph.edges).toHaveLength(56);
     expect(
       graph.edges.filter(
         ({ specifier, dependency }) =>
@@ -181,5 +201,10 @@ describe("Vercel adapter boundary", () => {
     expect(graph.files).not.toContain(
       resolve(workspace, "src", "core", "import", "index.ts"),
     );
+    expect(
+      graph.files.flatMap((filePath) =>
+        inlineTypeImportSpecifiers(readFileSync(filePath, "utf8"), filePath),
+      ),
+    ).toEqual([]);
   });
 });

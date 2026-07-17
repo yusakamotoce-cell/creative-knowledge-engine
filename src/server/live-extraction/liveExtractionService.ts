@@ -1,8 +1,9 @@
-import { candidateBundleSchema, type CandidateBundle } from "../../core/candidates/candidate.js";
+import { candidateBundleSchema } from "../../core/candidates/candidate.js";
+import type { CandidateBundle } from "../../core/candidates/candidate.js";
 import { validateCandidateBundleGrounding } from "../../core/import/candidateBundleGrounding.js";
-import type { ImportedDocument } from "../../core/import/importedDocument";
+import type { ImportedDocument } from "../../core/import/importedDocument.js";
 import { LiveExtractionServerError } from "./errors.js";
-import type { OpenAiProviderOutput } from "./openAiResponsesClient";
+import type { OpenAiProviderOutput } from "./openAiResponsesClient.js";
 import { LIVE_EXTRACTION_PROMPT_VERSION } from "./prompt.js";
 import { convertProviderCandidateBundle } from "./providerCandidateBundle.js";
 

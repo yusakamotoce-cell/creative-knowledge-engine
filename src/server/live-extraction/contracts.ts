@@ -15,4 +15,4 @@ export type {
   LiveExtractionRequest,
   LiveExtractionResponse,
   LiveExtractionSuccess,
-} from "../../app/extraction/liveExtractionContracts";
+} from "../../app/extraction/liveExtractionContracts.js";

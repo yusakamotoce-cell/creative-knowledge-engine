@@ -1,15 +1,13 @@
-import {
-  candidateBundleSchema,
-  type CandidateBundle,
-  type EntityCandidate,
-  type RelationshipCandidate,
+import { candidateBundleSchema } from "../candidates/candidate.js";
+import type {
+  CandidateBundle,
+  EntityCandidate,
+  RelationshipCandidate,
 } from "../candidates/candidate.js";
-import type { ScalarValue } from "../shared/schemas";
-import type { SourceRef } from "../shared/sourceRef";
-import {
-  importedDocumentSchema,
-  type ImportedDocument,
-} from "./importedDocument.js";
+import type { ScalarValue } from "../shared/schemas.js";
+import type { SourceRef } from "../shared/sourceRef.js";
+import { importedDocumentSchema } from "./importedDocument.js";
+import type { ImportedDocument } from "./importedDocument.js";
 
 export const CANDIDATE_BUNDLE_LIMITS = Object.freeze({
   entities: 40,

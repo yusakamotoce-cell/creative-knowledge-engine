@@ -4,8 +4,8 @@ import { normalizeScalarValue } from "../shared/normalization.js";
 import {
   isoDateTimeSchema,
   scalarValueSchema,
-  type ScalarValue,
 } from "../shared/schemas.js";
+import type { ScalarValue } from "../shared/schemas.js";
 import {
   buildSourceRefKey,
   sourceRefSchema,
