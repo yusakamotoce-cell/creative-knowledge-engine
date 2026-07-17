@@ -26,6 +26,20 @@ describe("Vercel health adapter", () => {
     });
   });
 
+  it("returns 200 and disabled without an API key when Live AI is false", async () => {
+    const response = createHealthFetchHandler({
+      LIVE_AI_ENABLED: "false",
+    })(new Request("https://example.test/api/health"));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      ok: true,
+      schemaVersion: 1,
+      service: "creative-knowledge-engine",
+      liveAi: "disabled",
+    });
+  });
+
   it("rejects non-GET requests", async () => {
     const response = createHealthFetchHandler({})(
       new Request("https://example.test/api/health", { method: "POST" }),

@@ -60,9 +60,26 @@ describe("Vercel adapter boundary", () => {
 
   it("keeps api/extract.ts as a thin adapter over the existing server service", () => {
     const source = readFileSync(resolve(workspace, "api", "extract.ts"), "utf8");
-    expect(source).toContain('from "../src/server/live-extraction"');
+    expect(source).toContain(
+      'from "../src/server/live-extraction/httpHandler.js"',
+    );
     expect(source).not.toContain("creative_knowledge_candidate_bundle");
     expect(source).not.toContain("LIVE_EXTRACTION_DEVELOPER_PROMPT");
     expect(source).not.toContain("providerCandidateBundleJsonSchema");
   });
+
+  it.each(["health.ts", "extract.ts"])(
+    "uses explicit ESM file specifiers in api/%s",
+    (fileName) => {
+      const source = readFileSync(resolve(workspace, "api", fileName), "utf8");
+      const specifiers = relativeImports(source);
+      expect(specifiers.length).toBeGreaterThan(0);
+      expect(specifiers.every((specifier) => specifier.endsWith(".js"))).toBe(
+        true,
+      );
+      expect(specifiers.every((specifier) => !specifier.endsWith("/index.js"))).toBe(
+        true,
+      );
+    },
+  );
 });

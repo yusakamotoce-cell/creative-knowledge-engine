@@ -1,9 +1,7 @@
-import {
-  createLiveExtractionHttpHandler,
-  type FetchLike,
-  LiveExtractionService,
-  OpenAiResponsesClient,
-} from "../src/server/live-extraction";
+import type { FetchLike } from "../src/server/live-extraction/contracts.js";
+import { createLiveExtractionHttpHandler } from "../src/server/live-extraction/httpHandler.js";
+import { LiveExtractionService } from "../src/server/live-extraction/liveExtractionService.js";
+import { OpenAiResponsesClient } from "../src/server/live-extraction/openAiResponsesClient.js";
 
 declare const process: {
   env: Readonly<Record<string, string | undefined>>;

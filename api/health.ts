@@ -1,7 +1,7 @@
 import {
   handleHealthRequest,
   type HealthEnvironment,
-} from "../src/server/health";
+} from "../src/server/health/healthHandler.js";
 
 declare const process: {
   env: Readonly<Record<string, string | undefined>>;
