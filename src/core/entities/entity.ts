@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { isoDateTimeSchema, nonEmptyTrimmedStringSchema } from "../shared/schemas";
-import { sourceRefSchema } from "../shared/sourceRef";
-import { attributeRecordSchema } from "./attributeRecord";
+import { isoDateTimeSchema, nonEmptyTrimmedStringSchema } from "../shared/schemas.js";
+import { sourceRefSchema } from "../shared/sourceRef.js";
+import { attributeRecordSchema } from "./attributeRecord.js";
 
 export const entityTypeSchema = z.enum([
   "character",

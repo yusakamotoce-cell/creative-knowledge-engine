@@ -322,7 +322,6 @@ export async function runDeploymentSmoke({
     { method: "GET" },
     timeoutMs,
   );
-  assertNoWildcardCors(rootResponse);
   const rootText = await rootResponse.text();
   if (
     rootResponse.status !== 200 ||

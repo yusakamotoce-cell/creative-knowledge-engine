@@ -2,15 +2,15 @@ import type { ImportedDocument } from "../../core/import/importedDocument";
 import {
   CandidateBundleGroundingError,
   type CandidateBundleGroundingErrorCode,
-} from "../../core/import/candidateBundleGrounding";
+} from "../../core/import/candidateBundleGrounding.js";
 import {
   LiveExtractionRequestError,
   validateLiveExtractionRequest,
-} from "./contracts";
+} from "./contracts.js";
 import {
   LiveExtractionServerError,
   type LiveExtractionServerErrorCode,
-} from "./errors";
+} from "./errors.js";
 import type { LiveExtractionService } from "./liveExtractionService";
 
 export interface LiveExtractionHttpRequest {

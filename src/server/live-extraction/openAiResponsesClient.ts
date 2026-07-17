@@ -1,10 +1,10 @@
 import type { FetchLike } from "./contracts";
-import { providerCandidateBundleJsonSchema } from "./providerCandidateBundleJsonSchema";
-import { LiveExtractionServerError } from "./errors";
+import { providerCandidateBundleJsonSchema } from "./providerCandidateBundleJsonSchema.js";
+import { LiveExtractionServerError } from "./errors.js";
 import {
   buildLiveExtractionUserContent,
   LIVE_EXTRACTION_DEVELOPER_PROMPT,
-} from "./prompt";
+} from "./prompt.js";
 import type { ImportedDocument } from "../../core/import/importedDocument";
 
 export const OPENAI_RESPONSES_API_URL =

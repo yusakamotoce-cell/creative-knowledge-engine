@@ -4,14 +4,14 @@ import {
   type CandidateBundle,
   type EntityReference,
 } from "../../core/candidates/candidate";
-import { entityTypeSchema } from "../../core/entities/entity";
-import { normalizeAttributeKey } from "../../core/shared/normalization";
+import { entityTypeSchema } from "../../core/entities/entity.js";
+import { normalizeAttributeKey } from "../../core/shared/normalization.js";
 import {
   nonEmptyTrimmedStringSchema,
   scalarValueSchema,
   type ScalarValue,
-} from "../../core/shared/schemas";
-import { CANDIDATE_BUNDLE_LIMITS } from "../../core/import/candidateBundleGrounding";
+} from "../../core/shared/schemas.js";
+import { CANDIDATE_BUNDLE_LIMITS } from "../../core/import/candidateBundleGrounding.js";
 
 const providerIdentifierSchema = nonEmptyTrimmedStringSchema.max(
   CANDIDATE_BUNDLE_LIMITS.identifierCharacters,

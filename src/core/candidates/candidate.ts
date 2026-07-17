@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { entityTypeSchema } from "../entities/entity";
+import { entityTypeSchema } from "../entities/entity.js";
 import {
   nonEmptyTrimmedStringSchema,
   scalarValueSchema,
-} from "../shared/schemas";
-import { sourceRefSchema } from "../shared/sourceRef";
+} from "../shared/schemas.js";
+import { sourceRefSchema } from "../shared/sourceRef.js";
 
 export const entityCandidateSchema = z.strictObject({
   candidateId: nonEmptyTrimmedStringSchema,

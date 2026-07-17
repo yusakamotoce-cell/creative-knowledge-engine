@@ -8,7 +8,7 @@ export {
   liveExtractionResponseSchema,
   liveExtractionSuccessSchema,
   validateLiveExtractionRequest,
-} from "../../app/extraction/liveExtractionContracts";
+} from "../../app/extraction/liveExtractionContracts.js";
 export type {
   FetchLike,
   LiveExtractionFailure,

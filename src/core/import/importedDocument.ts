@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { sha256HexSchema } from "../shared/sha256";
+import { sha256HexSchema } from "../shared/sha256.js";
 import {
   isoDateTimeSchema,
   nonEmptyTrimmedStringSchema,
-} from "../shared/schemas";
-import { ImportDomainError } from "./errors";
+} from "../shared/schemas.js";
+import { ImportDomainError } from "./errors.js";
 
 export const importSourceKindSchema = z.enum(["file", "pasted_text"]);
 export type ImportSourceKind = z.infer<typeof importSourceKindSchema>;

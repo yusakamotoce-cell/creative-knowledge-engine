@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { nonEmptyTrimmedStringSchema } from "./schemas";
+import { nonEmptyTrimmedStringSchema } from "./schemas.js";
 
 export const sourceRefSchema = z.strictObject({
   documentId: nonEmptyTrimmedStringSchema,

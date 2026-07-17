@@ -3,13 +3,13 @@ import {
   type CandidateBundle,
   type EntityCandidate,
   type RelationshipCandidate,
-} from "../candidates/candidate";
+} from "../candidates/candidate.js";
 import type { ScalarValue } from "../shared/schemas";
 import type { SourceRef } from "../shared/sourceRef";
 import {
   importedDocumentSchema,
   type ImportedDocument,
-} from "./importedDocument";
+} from "./importedDocument.js";
 
 export const CANDIDATE_BUNDLE_LIMITS = Object.freeze({
   entities: 40,

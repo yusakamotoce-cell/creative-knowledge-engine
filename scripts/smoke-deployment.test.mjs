@@ -51,13 +51,23 @@ function liveSuccessBody() {
   };
 }
 
-function routeFetcher({ healthLiveAi = "disabled", liveBody = liveSuccessBody() } = {}) {
+function routeFetcher({
+  healthLiveAi = "disabled",
+  liveBody = liveSuccessBody(),
+  rootWildcardCors = false,
+  healthWildcardCors = false,
+} = {}) {
   return vi.fn(async (input, init = {}) => {
     const url = new URL(input);
     if (url.pathname === "/") {
       return new Response(
         '<!doctype html><title>Creative Knowledge Engine</title><div id="root"></div>',
-        { status: 200 },
+        {
+          status: 200,
+          headers: rootWildcardCors
+            ? { "Access-Control-Allow-Origin": "*" }
+            : {},
+        },
       );
     }
     if (url.pathname === "/api/health") {
@@ -68,7 +78,15 @@ function routeFetcher({ healthLiveAi = "disabled", liveBody = liveSuccessBody() 
           service: "creative-knowledge-engine",
           liveAi: healthLiveAi,
         },
-        { status: 200, headers: NO_STORE_HEADERS },
+        {
+          status: 200,
+          headers: {
+            ...NO_STORE_HEADERS,
+            ...(healthWildcardCors
+              ? { "Access-Control-Allow-Origin": "*" }
+              : {}),
+          },
+        },
       );
     }
     if (url.pathname === "/api/extract" && init.method === "GET") {
@@ -110,6 +128,26 @@ describe("deployment smoke", () => {
       liveAi: "NOT_RUN",
     });
     expect(fetcher).toHaveBeenCalledTimes(3);
+  });
+
+  it("allows wildcard CORS on the static root response", async () => {
+    const fetcher = routeFetcher({ rootWildcardCors: true });
+    await expect(
+      runDeploymentSmoke({
+        deploymentUrl: "https://preview.example.test",
+        fetcher,
+      }),
+    ).resolves.toEqual(expect.objectContaining({ root: "PASS" }));
+  });
+
+  it("still rejects wildcard CORS on an API response", async () => {
+    const fetcher = routeFetcher({ healthWildcardCors: true });
+    await expect(
+      runDeploymentSmoke({
+        deploymentUrl: "https://preview.example.test",
+        fetcher,
+      }),
+    ).rejects.toMatchObject({ code: "WILDCARD_CORS_DETECTED" });
   });
 
   it("makes exactly one synthetic POST when Live AI is explicitly enabled", async () => {

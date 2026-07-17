@@ -1,7 +1,8 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { dirname, extname, resolve } from "node:path";
+import { basename, dirname, extname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
 const workspace = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,8 +18,11 @@ function relativeImports(source) {
 
 function resolveModule(fromPath, specifier) {
   const base = resolve(dirname(fromPath), specifier);
-  const candidates = extname(base).length > 0
-    ? [base]
+  const extension = extname(base);
+  const candidates = extension === ".js"
+    ? [base, `${base.slice(0, -3)}.ts`, `${base.slice(0, -3)}.tsx`]
+    : extension.length > 0
+      ? [base]
     : [
         base,
         `${base}.ts`,
@@ -30,6 +34,86 @@ function resolveModule(fromPath, specifier) {
         resolve(base, "index.tsx"),
       ];
   return candidates.find((candidate) => existsSync(candidate) && statSync(candidate).isFile());
+}
+
+function isRuntimeImport(statement) {
+  const clause = statement.importClause;
+  if (clause === undefined) return true;
+  if (clause.isTypeOnly) return false;
+  if (clause.name !== undefined) return true;
+  const bindings = clause.namedBindings;
+  if (bindings === undefined) return false;
+  if (ts.isNamespaceImport(bindings)) return true;
+  return bindings.elements.some((element) => !element.isTypeOnly);
+}
+
+function runtimeRelativeImports(source, filePath) {
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const specifiers = [];
+
+  for (const statement of sourceFile.statements) {
+    if (
+      ts.isImportDeclaration(statement) &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      isRuntimeImport(statement) &&
+      statement.moduleSpecifier.text.startsWith(".")
+    ) {
+      specifiers.push(statement.moduleSpecifier.text);
+    }
+    if (
+      ts.isExportDeclaration(statement) &&
+      statement.moduleSpecifier !== undefined &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      !statement.isTypeOnly &&
+      statement.moduleSpecifier.text.startsWith(".")
+    ) {
+      const hasRuntimeExport =
+        statement.exportClause === undefined ||
+        !ts.isNamedExports(statement.exportClause) ||
+        statement.exportClause.elements.some((element) => !element.isTypeOnly);
+      if (hasRuntimeExport) specifiers.push(statement.moduleSpecifier.text);
+    }
+  }
+
+  const visit = (node) => {
+    if (
+      ts.isCallExpression(node) &&
+      node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+      node.arguments.length === 1 &&
+      ts.isStringLiteral(node.arguments[0]) &&
+      node.arguments[0].text.startsWith(".")
+    ) {
+      specifiers.push(node.arguments[0].text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  ts.forEachChild(sourceFile, visit);
+
+  return specifiers;
+}
+
+function runtimeModuleGraph(entry) {
+  const files = new Set();
+  const edges = [];
+  const pending = [entry];
+  while (pending.length > 0) {
+    const filePath = pending.pop();
+    if (filePath === undefined || files.has(filePath)) continue;
+    files.add(filePath);
+    const source = readFileSync(filePath, "utf8");
+    for (const specifier of runtimeRelativeImports(source, filePath)) {
+      const dependency = resolveModule(filePath, specifier);
+      edges.push({ filePath, specifier, dependency });
+      if (dependency !== undefined) pending.push(dependency);
+    }
+  }
+  return { files: [...files], edges };
 }
 
 function browserModuleGraph(entry) {
@@ -82,4 +166,20 @@ describe("Vercel adapter boundary", () => {
       );
     },
   );
+
+  it("keeps the complete extraction runtime graph ESM-explicit and barrel-free", () => {
+    const graph = runtimeModuleGraph(resolve(workspace, "api", "extract.ts"));
+    expect(graph.files).toHaveLength(20);
+    expect(
+      graph.edges.filter(
+        ({ specifier, dependency }) =>
+          !specifier.endsWith(".js") ||
+          dependency === undefined ||
+          basename(dependency) === "index.ts",
+      ),
+    ).toEqual([]);
+    expect(graph.files).not.toContain(
+      resolve(workspace, "src", "core", "import", "index.ts"),
+    );
+  });
 });

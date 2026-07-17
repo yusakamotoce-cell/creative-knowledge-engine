@@ -1,4 +1,4 @@
-import { CANDIDATE_BUNDLE_LIMITS } from "../../core/import/candidateBundleGrounding";
+import { CANDIDATE_BUNDLE_LIMITS } from "../../core/import/candidateBundleGrounding.js";
 
 type JsonSchema = Readonly<Record<string, unknown>>;
 

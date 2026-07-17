@@ -1,15 +1,15 @@
 import { z } from "zod";
 
-import { normalizeScalarValue } from "../shared/normalization";
+import { normalizeScalarValue } from "../shared/normalization.js";
 import {
   isoDateTimeSchema,
   scalarValueSchema,
   type ScalarValue,
-} from "../shared/schemas";
+} from "../shared/schemas.js";
 import {
   buildSourceRefKey,
   sourceRefSchema,
-} from "../shared/sourceRef";
+} from "../shared/sourceRef.js";
 
 export const attributeClaimSchema = z.strictObject({
   value: scalarValueSchema,

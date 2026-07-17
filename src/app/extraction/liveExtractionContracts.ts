@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { importFormatSchema } from "../../core/import/importedDocument";
+import { importFormatSchema } from "../../core/import/importedDocument.js";
 
 export const LIVE_EXTRACTION_REQUEST_SCHEMA_VERSION = 1 as const;
 export const LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS = 20_000;
