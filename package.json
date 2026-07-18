@@ -21,6 +21,8 @@
     "video:metadata": "node tools/video/metadata.mjs",
     "video:prepare": "npm run build && node tools/video/run-playwright.mjs prepare",
     "video:record": "npm run video:metadata && npm run build && node tools/video/run-playwright.mjs shots",
+    "video:dry-run:live": "node tools/video/run-playwright.mjs live/14_live_ai_success.spec.ts",
+    "video:record:live": "node tools/video/run-playwright.mjs live/14_live_ai_success.spec.ts",
     "video:verify": "node tools/video/verify-artifacts.mjs",
     "video:all": "npm run video:prepare && npm run video:record && npm run video:verify"
   },

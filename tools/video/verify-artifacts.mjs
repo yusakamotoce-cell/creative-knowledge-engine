@@ -8,7 +8,7 @@ const artifactRoot = path.join(root, "artifacts", "video");
 const clipsDirectory = path.join(artifactRoot, "clips");
 const reportsDirectory = path.join(artifactRoot, "reports");
 
-const expectedShots = [
+const nonLiveShots = [
   ["01_title_problem", "01_title_problem.webm", 7_000],
   ["02_duplicate_conflict_problem", "02_duplicate_conflict_problem.webm", 11_000],
   ["03_home_intro", "03_home_intro.webm", 10_000],
@@ -23,6 +23,11 @@ const expectedShots = [
   ["12_graph", "12_graph.webm", 11_000],
   ["13_export", "13_export.webm", 10_000],
   ["15_codex_finish", "15_codex_finish.webm", 13_000],
+];
+const liveShot = [
+  "14_live_ai_success",
+  "14_live_ai_success.webm",
+  13_000,
 ];
 
 function inspectWithFfprobe(filePath) {
@@ -59,6 +64,10 @@ function inspectWithFfprobe(filePath) {
 const actualClipNames = (await readdir(clipsDirectory))
   .filter((fileName) => fileName.endsWith(".webm"))
   .sort();
+const liveAiShotRecorded = actualClipNames.includes(liveShot[1]);
+const expectedShots = liveAiShotRecorded
+  ? [...nonLiveShots, liveShot]
+  : nonLiveShots;
 const expectedClipNames = expectedShots.map(([, fileName]) => fileName).sort();
 if (JSON.stringify(actualClipNames) !== JSON.stringify(expectedClipNames)) {
   throw new Error(
@@ -89,8 +98,12 @@ for (const [shotId, fileName, targetDurationMs] of expectedShots) {
     "consoleErrors",
     "pageErrors",
   ]) {
-    if (report[key] !== 0) {
-      throw new Error(`${fileName} has non-zero ${key}.`);
+    const expectedValue =
+      shotId === "14_live_ai_success" && key === "liveAiRequests" ? 1 : 0;
+    if (report[key] !== expectedValue) {
+      throw new Error(
+        `${fileName} has unexpected ${key}: expected ${expectedValue}.`,
+      );
     }
   }
   const recordedContentDurationMs =
@@ -162,16 +175,39 @@ if (
 ) {
   throw new Error("Shot 15 final card text is incorrect.");
 }
+if (
+  liveAiShotRecorded &&
+  (byId["14_live_ai_success"]?.extractPostAttempts !== 1 ||
+    byId["14_live_ai_success"]?.extractPostsSent !== 1 ||
+    byId["14_live_ai_success"]?.extractResponseStatus !== 200 ||
+    byId["14_live_ai_success"]?.automaticRetries !== 0 ||
+    byId["14_live_ai_success"]?.fixtureExtractionUsed !== false ||
+    byId["14_live_ai_success"]?.fallbackUsed !== false ||
+    byId["14_live_ai_success"]?.structuredOutputAcceptedByUi !== true ||
+    byId["14_live_ai_success"]?.humanReviewVisible !== true ||
+    byId["14_live_ai_success"]?.automaticAccept !== false)
+) {
+  throw new Error("Shot 14A Live AI contract assertion is missing or incorrect.");
+}
 
 const result = {
   status: "PASS",
-  scope: "14 non-Live-AI clips",
+  scope: liveAiShotRecorded ? "15 selected clips" : "14 non-Live-AI clips",
   ffprobeAvailable,
-  liveAiShotRecorded: false,
+  liveAiShotRecorded,
+  totalDurationSeconds: verification.reduce(
+    (total, clip) => total + (clip.durationSeconds ?? 0),
+    0,
+  ),
   clips: verification,
 };
 await writeFile(
-  path.join(reportsDirectory, "non-live-verification.json"),
+  path.join(
+    reportsDirectory,
+    liveAiShotRecorded
+      ? "all-clips-verification.json"
+      : "non-live-verification.json",
+  ),
   `${JSON.stringify(result, null, 2)}\n`,
   "utf8",
 );
@@ -185,5 +221,7 @@ for (const clip of verification) {
   );
 }
 process.stdout.write(
-  `PASS: ${verification.length} non-Live-AI clips; Shot 14A not recorded.\n`,
+  liveAiShotRecorded
+    ? `PASS: ${verification.length} selected clips; total ${result.totalDurationSeconds.toFixed(2)}s.\n`
+    : `PASS: ${verification.length} non-Live-AI clips; Shot 14A not recorded.\n`,
 );

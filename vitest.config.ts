@@ -5,6 +5,7 @@ export default defineConfig({
     environment: "jsdom",
     exclude: [
       ...configDefaults.exclude,
+      "tools/video/live/**",
       "tools/video/prepare/**",
       "tools/video/shots/**",
     ],
