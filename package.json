@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "preview": "vite preview",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -15,7 +16,12 @@
     "smoke:deployment": "node scripts/smoke-deployment.mjs",
     "scan:secrets": "node scripts/scan-secrets.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "video:install": "playwright install chromium",
+    "video:metadata": "node tools/video/metadata.mjs",
+    "video:prepare": "npm run build && node tools/video/run-playwright.mjs prepare",
+    "video:record": "npm run build && node tools/video/run-playwright.mjs shots",
+    "video:verify": "node tools/video/verify-artifacts.mjs"
   },
   "dependencies": {
     "react": "19.2.7",
@@ -24,10 +30,13 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.61.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
+    "@types/node": "22.20.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
+    "@types/node": "22.20.1",
     "@vitejs/plugin-react": "6.0.3",
     "eslint": "10.7.0",
     "eslint-plugin-react-hooks": "7.1.1",

@@ -56,7 +56,7 @@ async function beginNextDocument(expectedFileName: string): Promise<void> {
   if (expectedFileName === "01-astra-foundation.md") {
     await screen.findByRole("heading", { name: /散らばった設定/ });
     fireEvent.click(
-      screen.getByRole("button", { name: "Project Astra Demoを開始" }),
+      screen.getByRole("button", { name: "The Names Between Stars Demoを開始" }),
     );
   } else {
     await screen.findByRole("heading", { name: "文書をImport" });

@@ -75,7 +75,7 @@ describe("App", () => {
 
     expect(screen.getByRole("heading", { name: "Workspaceを読み込んでいます" })).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: /散らばった設定/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Project Astra Demoを開始" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "The Names Between Stars Demoを開始" })).toBeInTheDocument();
     expect(storage.loads).toBe(1);
   });
 
@@ -108,7 +108,7 @@ describe("App", () => {
     render(<App dependencies={createTestApplicationDependencies()} />);
     await screen.findByRole("heading", { name: /散らばった設定/ });
 
-    fireEvent.click(screen.getByRole("button", { name: "Project Astra Demoを開始" }));
+    fireEvent.click(screen.getByRole("button", { name: "The Names Between Stars Demoを開始" }));
 
     expect(await screen.findByRole("heading", { name: "01-astra-foundation.md" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Entity Candidate Review" })).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe("App", () => {
     const storage = new MemoryStorageAdapter();
     const first = render(<App dependencies={createTestApplicationDependencies(storage)} />);
     await screen.findByRole("heading", { name: /散らばった設定/ });
-    fireEvent.click(screen.getByRole("button", { name: "Project Astra Demoを開始" }));
+    fireEvent.click(screen.getByRole("button", { name: "The Names Between Stars Demoを開始" }));
     await screen.findByRole("heading", { name: "Entity Candidate Review" });
     fireEvent.click(screen.getByRole("button", { name: "Accept as new" }));
     await screen.findByText(/このCandidateはacceptedとして保存済み/);
@@ -127,7 +127,7 @@ describe("App", () => {
 
     render(<App dependencies={createTestApplicationDependencies(storage)} />);
     await screen.findByRole("heading", { name: /散らばった設定/ });
-    fireEvent.click(screen.getByRole("button", { name: "Project Astra Demoを開始" }));
+    fireEvent.click(screen.getByRole("button", { name: "The Names Between Stars Demoを開始" }));
 
     const list = await screen.findByRole("navigation", { name: "Entity Candidate一覧" });
     const novaButton = within(list).getByRole("button", { name: /Nova Arclight.*accepted/ });

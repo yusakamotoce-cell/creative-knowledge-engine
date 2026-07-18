@@ -8,3 +8,7 @@ coverage/
 .env
 .env.local
 .vercel/
+artifacts/video/
+playwright-report-video/
+test-results-video/
+.playwright-video/

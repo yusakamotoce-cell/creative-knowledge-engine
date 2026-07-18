@@ -1,3 +1,4 @@
+import { PUBLIC_DEMO_STORY_NAME } from "../demo/publicDemoStory";
 import type { UiError } from "./types";
 
 const errorMessages: Record<string, Omit<UiError, "code">> = {
@@ -16,7 +17,7 @@ const errorMessages: Record<string, Omit<UiError, "code">> = {
   FIXTURE_NOT_FOUND: {
     title: "保存済みの抽出結果がありません",
     detail:
-      "Project Astra DemoのFixtureと文書内容が一致しません。Fixtureを確認してください。",
+      `${PUBLIC_DEMO_STORY_NAME} DemoのFixtureと文書内容が一致しません。Fixtureを確認してください。`,
   },
   LIVE_AI_UNAVAILABLE: {
     title: "Live AIを利用できません",

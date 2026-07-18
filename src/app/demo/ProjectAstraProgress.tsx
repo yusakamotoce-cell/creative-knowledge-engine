@@ -1,4 +1,5 @@
 import type { ProjectAstraDocumentProgress } from "../state/projectAstraProgress";
+import { PUBLIC_DEMO_STORY_NAME } from "./publicDemoStory";
 
 const statusLabels: Record<ProjectAstraDocumentProgress["status"], string> = {
   not_imported: "未Import",
@@ -18,7 +19,7 @@ export function ProjectAstraProgress(props: {
       <div className="section-heading">
         <div>
           <p className="eyebrow">Network-free Demo</p>
-          <h2 id="astra-progress-title">Project Astra</h2>
+          <h2 id="astra-progress-title">{PUBLIC_DEMO_STORY_NAME}</h2>
         </div>
         <strong>{applied} / 4 applied</strong>
       </div>

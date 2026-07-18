@@ -3,6 +3,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import type { ImportDocumentInput, ImportFormat } from "../../core/import";
 import type { StorageSnapshot } from "../../core/storage";
 import type { ProjectAstraFixture } from "../../data/demo/project-astra";
+import { PUBLIC_DEMO_STORY_NAME } from "../demo/publicDemoStory";
 import { LIVE_EXTRACTION_MAX_CONTENT_CHARACTERS } from "../extraction";
 import {
   deriveProjectAstraProgress,
@@ -94,13 +95,13 @@ export function ImportView(props: {
       <section className="page-intro">
         <p className="eyebrow">Bring source material</p>
         <h1>文書をImport</h1>
-        <p>Project Astra Demo、または任意のテキスト文書をReviewの入口へ送ります。</p>
+        <p>{PUBLIC_DEMO_STORY_NAME} Demo、または任意のテキスト文書をReviewの入口へ送ります。</p>
       </section>
 
       <div className="two-column-layout import-layout">
         <section className="panel" aria-labelledby="demo-import-title">
           <p className="eyebrow">Demo Mode</p>
-          <h2 id="demo-import-title">次のProject Astra文書</h2>
+          <h2 id="demo-import-title">次の{PUBLIC_DEMO_STORY_NAME}文書</h2>
           {next.kind === "import" ? (
             <article className="document-card">
               <span className="document-order">{String(next.source.order).padStart(2, "0")}</span>
@@ -128,7 +129,7 @@ export function ImportView(props: {
           ) : (
             <div className="empty-state"><h3>全4文書を反映済みです</h3></div>
           )}
-          <ol className="compact-progress" aria-label="Project Astra文書状況">
+          <ol className="compact-progress" aria-label={`${PUBLIC_DEMO_STORY_NAME}文書状況`}>
             {progress.map((item) => (
               <li key={item.documentId}>
                 <span>{item.order}. {item.fileName}</span><strong>{item.status}</strong>

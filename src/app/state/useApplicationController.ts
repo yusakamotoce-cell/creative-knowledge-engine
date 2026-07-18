@@ -33,6 +33,7 @@ import {
 import type { KnowledgeGraphFilters } from "../../core/graph";
 import type { EntitySearchFilters } from "../../core/search";
 import type { StorageSnapshot } from "../../core/storage";
+import { PUBLIC_DEMO_STORY_NAME } from "../demo/publicDemoStory";
 import { createKnowledgeExportFileName } from "../download/fileDownloadAdapter";
 import { mapErrorToUi } from "./errorMapping";
 import {
@@ -272,7 +273,7 @@ export function useApplicationController(
           activeReviewSessionId: null,
           message: {
             kind: "success",
-            text: "Project Astra Demoは完了しています。",
+            text: `${PUBLIC_DEMO_STORY_NAME} Demoは完了しています。`,
           },
         }));
         return;

@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import type { StorageSnapshot } from "../../core/storage";
 import type { ProjectAstraFixture } from "../../data/demo/project-astra";
 import { ProjectAstraProgress } from "../demo/ProjectAstraProgress";
+import { PUBLIC_DEMO_STORY_NAME } from "../demo/publicDemoStory";
 import {
   deriveProjectAstraProgress,
   isEmptyWorkspace,
@@ -87,8 +88,8 @@ export function HomeView(props: {
               onClick={() => void props.actions.startOrResumeProjectAstra()}
             >
               {progress.every((item) => item.status === "applied")
-                ? "Project Astraの完成Knowledgeを見る"
-                : "Project Astra Demoを開始"}
+                ? `${PUBLIC_DEMO_STORY_NAME}の完成Knowledgeを見る`
+                : `${PUBLIC_DEMO_STORY_NAME} Demoを開始`}
             </button>
             <button type="button" onClick={() => props.actions.navigate("import")}>
               文書をImport

@@ -47,7 +47,7 @@ describe("explicit Fixture and Live extraction routing", () => {
     await screen.findByRole("heading", { name: /散らばった設定/ });
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Project Astra Demoを開始" }),
+      screen.getByRole("button", { name: "The Names Between Stars Demoを開始" }),
     );
 
     expect(

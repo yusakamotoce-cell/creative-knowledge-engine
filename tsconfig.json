@@ -24,6 +24,8 @@
   "include": [
     "api",
     "src",
+    "tools/video",
+    "playwright.video.config.ts",
     "vite.config.ts",
     "vitest.config.ts"
   ]
