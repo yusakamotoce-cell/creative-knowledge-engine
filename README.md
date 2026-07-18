@@ -6,7 +6,7 @@ It is designed as a standalone product and as an integration-ready core module f
 
 ## Current status
 
-This repository implements **Step 0–8** and the local, authentication-free preparation for **Step 9**: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, browser review, deterministic Search, a read-only Knowledge Graph, versioned Knowledge JSON Export, optional server-side GPT-5.6 Live Extraction, and Vercel deployment checks. Step 9 remains blocked until Preview/Production and a real OpenAI API smoke pass.
+This repository implements **Step 0–9**: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, browser review, deterministic Search, a read-only Knowledge Graph, versioned Knowledge JSON Export, optional server-side GPT-5.6 Live Extraction, and verified Vercel Production deployment. Step 9 is `COMPLETE: PRODUCTION_VERIFIED`.
 
 Implemented:
 
@@ -68,12 +68,12 @@ Implemented:
 - opt-in public deployment smoke with exact SourceRef validation
 - tracked/source/build secret-value inspection
 
-Not implemented or not completed through the current Step 9 preparation:
+Deferred after Step 9:
 
 - IndexedDB adapter and multi-tab synchronization
 - Context Bundle
 - authentication, billing, and semantic Search
-- authenticated GitHub/Vercel/OpenAI setup, Vercel Firewall publication, deployment, and real OpenAI API verification
+- focused submission README polish, demo video production, and Devpost preparation
 - Step 10 or later functionality
 
 ## Core boundaries
@@ -152,7 +152,7 @@ OPENAI_MODEL=gpt-5.6
 LIVE_AI_ENABLED=false
 ```
 
-Begin with Live AI disabled. Verify the Fixture Demo, then publish a Vercel Firewall rate limit for `POST /api/extract`: same IP/client, five requests per minute, HTTP 429. Only then set `LIVE_AI_ENABLED=true` and run the real smoke. Production follows the same sequence after Preview passes. Use a dedicated OpenAI Project with a minimal key and configured usage notification/budget.
+Begin with Live AI disabled. Verify the Fixture Demo, then publish a Vercel Firewall rate limit for `POST /api/extract`. Production uses a fixed 600-second window, five requests per IP address, and HTTP 429 for excess requests. Only then set `LIVE_AI_ENABLED=true` and run the real smoke. Production follows the same sequence after Preview passes. Use a dedicated OpenAI Project with a minimal key and configured usage notification/budget.
 
 `GET /api/health` never calls OpenAI. It returns only the fixed service envelope and whether Live AI has both a non-disabled setting and a non-blank server key. It does not prove upstream connectivity. All API responses use `Cache-Control: no-store`.
 
@@ -173,13 +173,13 @@ npm.cmd run smoke:deployment
 
 The command never prints or saves the raw response and never retries. A missing deployment URL returns a blocked non-success result. Inspect tracked/source/build artifacts with `npm run scan:secrets`.
 
-Public app URL:
+Public app URL: https://creative-knowledge-engine.vercel.app
 
-Repository URL:
+Repository URL: https://github.com/yusakamotoce-cell/creative-knowledge-engine
 
-Stable commit:
+Stable commit: `db562a7 Fix all Vercel function import specifiers`
 
-These fields remain blank until authenticated deployment and real API verification succeed.
+These are the verified Step 9 Production references.
 
 ### Search, Graph, and Export
 
@@ -298,6 +298,6 @@ The Step 6 workflow checklist remains in `notes/reviews/STEP_6_MANUAL_CHECKLIST.
 
 ## Deferred integration questions
 
-IndexedDB, multi-tab synchronization, Context Bundle, authentication, billing, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 10+ behavior are deferred. Step 9's platform rate limit is specified but remains blocked on authenticated Vercel configuration.
+IndexedDB, multi-tab synchronization, Context Bundle, authentication, billing, semantic/fuzzy Search, editable or persisted Graph layout, export import, and all Step 10+ behavior are deferred. Step 9's Production platform rate limit and real API verification are complete.
 
-The Step 9 deployment status and decisions are recorded in `notes/reviews/STEP_9_DEPLOYMENT_CHECKLIST.md` and `notes/reviews/STEP_9_IMPLEMENTATION_DECISIONS.md`. Step 9 is currently `BLOCKED: REAL_API_NOT_VERIFIED`; local mock success is not a real API pass.
+The Step 9 deployment status and decisions are recorded in `notes/reviews/STEP_9_DEPLOYMENT_CHECKLIST.md` and `notes/reviews/STEP_9_IMPLEMENTATION_DECISIONS.md`. Step 9 is `COMPLETE: PRODUCTION_VERIFIED`; the Production Live AI smoke is the required real API pass.

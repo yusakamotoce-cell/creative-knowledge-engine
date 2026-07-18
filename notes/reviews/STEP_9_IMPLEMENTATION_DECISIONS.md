@@ -1,78 +1,107 @@
 # Step 9 Implementation Decisions
 
-**Status:** BLOCKED — REAL_API_NOT_VERIFIED
+**Status:** COMPLETE — PRODUCTION_VERIFIED
 
-**Date:** 2026-07-17
+**Completion date:** 2026-07-18
 
 ## Starting point
 
-Implementation started from commit `3040e17 Complete Creative Knowledge Engine Step 8` with a clean working tree and no configured Git remote. The existing 561 tests, typecheck, lint, production build, and offline audit all passed before work began.
+Step 9 started from `3040e17 Complete Creative Knowledge Engine Step 8` with a clean working tree. The existing 561 tests, typecheck, lint, production build, and offline audit passed before deployment preparation began.
 
-## Vercel and Node
+Vercel remained the fixed submission target. The implementation kept Vite auto-detection, `npm run build`, `dist`, Node 22.x, and thin Web-standard Functions under `api/`. No product feature, platform rewrite, or `vercel.json` was added.
 
-Vercel is fixed as the deployment target. Local Node was measured at 22.17.0; Vercel currently supports Node 22.x, so `package.json.engines.node` is `22.x`. Vite auto-detection, `npm run build`, and `dist` satisfy the current layout, so no `vercel.json` was added. This avoids unnecessary rewrites, CORS, runtime, or security-header configuration.
+## Production result
 
-No `maxDuration` is set because the Vercel plan and its permitted duration are not known. The existing OpenAI client timeout remains 55 seconds; platform duration must be checked against the selected plan before enabling Live AI.
+Production is deployed at:
 
-References used for platform compatibility:
+https://creative-knowledge-engine.vercel.app
 
-- https://vercel.com/docs/functions/runtimes/node-js
-- https://vercel.com/docs/functions/runtimes/node-js/node-js-versions
+The stable Production source includes:
 
-## Function export and health
+- `dfc9635 Fix Vercel ESM function imports`
+- `ba0c5f8 Fix Vercel extract runtime imports`
+- `db562a7 Fix all Vercel function import specifiers`
 
-`api/extract.ts` now exports Vercel's Web-standard default object with `fetch(request)`. It only translates Web Request/Response and environment values into the existing server HTTP handler, LiveExtractionService, and OpenAI client. Prompt, provider Schema, conversion, domain validation, grounding, and error mapping remain in existing server modules.
+`GET /api/health` returns HTTP 200 JSON with `Cache-Control: no-store`, the fixed service/schema envelope, and `liveAi: enabled`. It exposes no key metadata and does not call OpenAI.
 
-`GET /api/health` is a non-billable endpoint. It returns only schema version, fixed service name, and `enabled`/`disabled`; it never calls OpenAI. Disabled means the key is absent/blank or `LIVE_AI_ENABLED=false`. GET returns 200; other methods return safe 405; all responses are JSON with `Cache-Control: no-store` and no wildcard CORS.
+`GET /api/extract` reaches the application handler and returns HTTP 405 JSON with `Cache-Control: no-store` and the existing `METHOD_NOT_ALLOWED` envelope. It makes no OpenAI request.
 
-## Environment separation and dedicated OpenAI Project
+The Production deployment smoke completed with:
 
-Preview and Production must be configured separately with server-only `OPENAI_API_KEY`, `OPENAI_MODEL=gpt-5.6`, and `LIVE_AI_ENABLED`. Each environment starts with Live AI disabled. A dedicated OpenAI Project, minimal key, usage notification/budget, and available model access must be configured manually. No key was requested, read, logged, or stored during local work.
+`PASS: deployment smoke passed (Live AI: PASS).`
 
-## Vercel Firewall and Preview-first release
+The real synthetic Live AI path verified GPT-5.6 connectivity, the OpenAI Responses API, strict Structured Outputs, provider DTO conversion, the unchanged Candidate Bundle schema, exact raw SourceRef grounding, and the success response consumed by Human Review. The smoke did not print or persist the raw response and did not retry.
 
-Public Live AI requires a published Vercel Firewall rate-limit rule for `POST /api/extract`, same IP/client, five requests per minute, HTTP 429. An in-memory counter is deliberately absent. Production remains disabled until Preview passes and the equivalent Production rule is verified.
+The former status:
 
-Reference used for the manual platform rule:
+`BLOCKED: REAL_API_NOT_VERIFIED`
 
-- https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting
+is resolved as:
 
-## Deployment smoke and secret inspection
+`COMPLETE: PRODUCTION_VERIFIED`
 
-`npm run smoke:deployment` requires an HTTPS `DEPLOYMENT_URL`. It checks the app root, strict health envelope, `no-store`, GET `/api/extract` 405, wildcard CORS absence, and safe errors. It does not call OpenAI by default. `RUN_LIVE_AI=true` enables exactly one synthetic POST with no retry; the raw response is neither printed nor saved. The script validates the success envelope, converted domain attributes record, document ID, scalar values, and exact SourceRef grounding.
+## Vercel WAF
 
-`npm run scan:secrets` scans Git tracked and untracked source, `dist`, source maps, available Vercel function output, and `.env.local` without printing matched values. It allows the `OPENAI_API_KEY` variable name but rejects key-shaped values, Bearer key values, a known test marker, and a non-empty key value in `.env.local`. Exit codes are 0 clean, 1 findings, and 2 scanner error.
+The public extraction endpoint is protected by this deployed rule:
 
-## Real API smoke result
+- Request Path Equals `/api/extract`
+- Method Equals `POST`
+- Fixed Window: 600 seconds
+- Limit: 5 requests
+- Key: IP Address
+- Excess action: HTTP 429
 
-**BLOCKED: REAL_API_NOT_VERIFIED.** No Git remote, Vercel project, Preview URL, dedicated OpenAI Project/key, or published WAF rule is available in the workspace. The deployment smoke and actual OpenAI Responses API call therefore were not executed. Local mocks are not counted as real API success.
+This platform rule remains separate from application-domain behavior. No in-memory rate limiter was added.
 
-The local `vercel` command is not installed. The non-billable deployment smoke was invoked without a URL and correctly returned `BLOCKED: DEPLOYMENT_URL_NOT_SET` rather than success.
+## OpenAI Project and key operations
 
-## Local verification
+Production uses a Build Week-only OpenAI Project and a Restricted API key with Responses Write permission only. The key is stored only as a Vercel Sensitive server-side environment variable.
 
-- 61 test files and 594 tests passed, including the existing 561 tests.
-- typecheck, lint, and the Vite production build passed; the build transformed 191 modules.
-- offline audit reported 0 vulnerabilities.
-- secret scan reported 0 values across 297 tracked/untracked source and built text artifacts.
-- the browser entry graph contains no server module, and the built browser assets contain no OpenAI upstream URL, provider schema name, or developer prompt symbol.
-- `git diff --check` passed; new untracked files also have no trailing whitespace.
+No API key value, Project ID, OIDC token, Authorization header, or environment-variable value is recorded in source, logs, repository documents, this decision record, or browser-visible state.
 
-## Production URL and stable commit
+The deployed request retains `store: false`. API responses retain `Cache-Control: no-store`; these settings protect different storage boundaries and neither replaces the other.
 
-- Public app URL:
-- Repository URL:
-- Stable commit:
+## ESM import incident and remediation
 
-These fields remain blank rather than containing guessed or placeholder URLs. The starting Step 8 commit is known, but there is no completed Step 9 commit.
+The first Production failures occurred during Vercel Function module initialization, before any OpenAI communication. Node 22 ESM could not resolve directory imports or extensionless relative imports in the Function dependency graph.
 
-## Known limitations
+The runtime import graph was first corrected to explicit `.js` file paths and direct files instead of directory barrels. Production then exposed a remaining failure:
 
-- Preview and Production builds, public browser behavior, console/network state, WAF behavior, and public headers remain unverified.
-- Real model access, Structured Outputs compatibility, `store: false`, provider conversion, grounding, Review/Apply, and reImport through the deployed endpoint remain unverified.
-- Additional security headers were not added because Step 9 requires real browser compatibility checks first.
-- GitHub repository creation, Vercel configuration, OpenAI Project setup, environment values, WAF publication, and deployments require explicit authenticated user actions.
+`providerCandidateBundle.js` attempted to import the extensionless `src/core/candidates/candidate` module.
 
-## Scope protection
+The earlier graph audit had excluded type-only edges on the assumption that TypeScript would erase them. That assumption was insufficient for Vercel's actual JavaScript transformation: the inline type-only import remained in emitted Function JavaScript.
 
-No Context Bundle, IndexedDB, authentication, billing, semantic Search, product feature, or Step 10 work was added. Project Astra frozen material, Fixture Contract, Candidate Bundles, golden JSON, and upper specifications remain unchanged.
+The final correction:
+
+- audits every relative edge reachable from the Function, not only value/runtime edges;
+- includes value imports, top-level `import type`, and type re-exports;
+- uses explicit `.js` file specifiers everywhere;
+- replaces directory barrels with direct file imports;
+- converts inline type imports to top-level `import type`;
+- verifies all 56 source edges resolve;
+- leaves extensionless imports, directory imports, unresolved imports, and inline type imports at zero.
+
+The local Windows `vercel build --prod` path was not used as final evidence because Vercel CLI 56.3.1 rebuilt the child-process PATH without a usable Node.js command. No PATH helper or generated Vercel output remains in the repository. Preview and Production deployment verification supplied the authoritative Function-runtime evidence.
+
+## Final verification
+
+- 61 test files and 600 tests passed.
+- typecheck passed.
+- lint passed.
+- Vite production build passed and transformed 191 modules.
+- secret scan reported 0 findings.
+- Production root, health, extract method boundary, and real Live AI smoke passed.
+- the GET method-boundary check made no external OpenAI request.
+- frozen specifications, Project Astra materials, Fixture Contract, Candidate Bundle JSON, and golden JSON remain unchanged.
+
+## Completion boundary
+
+Step 9 is complete. Remaining Build Week work is not a product implementation step:
+
+- focused README submission polish;
+- demo video production;
+- Devpost preparation.
+
+Video Shot 14 is fixed as **14A — Live AI success version**.
+
+No Context Bundle, IndexedDB, authentication, billing, semantic Search, new product feature, or Step 10 behavior was added.
