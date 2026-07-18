@@ -20,8 +20,9 @@
     "video:install": "playwright install chromium",
     "video:metadata": "node tools/video/metadata.mjs",
     "video:prepare": "npm run build && node tools/video/run-playwright.mjs prepare",
-    "video:record": "npm run build && node tools/video/run-playwright.mjs shots",
-    "video:verify": "node tools/video/verify-artifacts.mjs"
+    "video:record": "npm run video:metadata && npm run build && node tools/video/run-playwright.mjs shots",
+    "video:verify": "node tools/video/verify-artifacts.mjs",
+    "video:all": "npm run video:prepare && npm run video:record && npm run video:verify"
   },
   "dependencies": {
     "react": "19.2.7",

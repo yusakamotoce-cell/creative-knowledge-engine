@@ -11,6 +11,12 @@ import {
   videoShotManifest,
 } from "./shotManifest.js";
 import { assertNoSecretMaterial, escapeHtml } from "./safety.js";
+import {
+  codexFinishCard,
+  finalCardMarkup,
+  FINAL_CARD_LINES,
+  scatteredLoreCard,
+} from "./titleCards.js";
 
 describe("video automation manifest", () => {
   it("contains 15 unique selected shots totaling exactly 165 seconds", () => {
@@ -39,6 +45,12 @@ describe("video automation manifest", () => {
       targetDurationMs: 13_000,
       sourceState: "doc1-entity-review",
     });
+  });
+
+  it("defines exactly 14 non-Live-AI shots", () => {
+    expect(
+      videoShotManifest.filter((shot) => !("liveAiVariant" in shot)),
+    ).toHaveLength(14);
   });
 });
 
@@ -103,5 +115,34 @@ describe("video artifact paths and content safety", () => {
       assertNoSecretMaterial("Authorization: Bearer private-token"),
     ).toThrow(/secret-like/u);
     expect(() => assertNoSecretMaterial("fixture-only")).not.toThrow();
+  });
+});
+
+describe("generated recording cards", () => {
+  it("shows all four scattered source file names", () => {
+    const card = scatteredLoreCard();
+    for (const fileName of [
+      "character-notes.md",
+      "world-setting.md",
+      "revision.json",
+      "scene-draft.md",
+    ]) {
+      expect(card).toContain(fileName);
+    }
+  });
+
+  it("renders a supplied dynamic test count", () => {
+    const card = codexFinishCard(742);
+    expect(card).toContain("742");
+    expect(card).not.toContain("FINAL_TEST_COUNT");
+  });
+
+  it("uses the exact frozen final card text", () => {
+    expect(FINAL_CARD_LINES).toEqual([
+      "From scattered lore",
+      "to creator-controlled canon.",
+    ]);
+    expect(finalCardMarkup()).toContain("From scattered lore");
+    expect(finalCardMarkup()).toContain("to creator-controlled canon.");
   });
 });
