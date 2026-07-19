@@ -79,7 +79,6 @@ Deferred after Step 9:
 - IndexedDB adapter and multi-tab synchronization
 - Context Bundle
 - authentication, billing, and semantic Search
-- focused submission README polish, demo video production, and Devpost preparation
 - Step 10 or later functionality
 
 ## Core boundaries
@@ -182,8 +181,6 @@ The command never prints or saves the raw response and never retries. A missing 
 Public app URL: https://creative-knowledge-engine.vercel.app
 
 Repository URL: https://github.com/yusakamotoce-cell/creative-knowledge-engine
-
-Stable commit: `db562a7 Fix all Vercel function import specifiers`
 
 These are the verified Step 9 Production references.
 
