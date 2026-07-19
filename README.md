@@ -10,7 +10,7 @@ It is designed as a standalone product and as an integration-ready core module f
 - Demo Video: https://www.youtube.com/watch?v=Y0k9MBR0AoA
 - Source Code: https://github.com/yusakamotoce-cell/creative-knowledge-engine
 
-- ## How Codex and GPT-5.6 were used
+## How Codex and GPT-5.6 were used
 
 - **Codex:** Codex supported the project from specification through implementation, architecture review, debugging, testing, and deployment preparation. The resulting domain and application behavior is protected by 620 automated tests, with all changes reviewed before integration.
 - **GPT-5.6:** GPT-5.6 powers the optional Live Extraction workflow through the OpenAI Responses API and Structured Outputs. It converts imported creative documents into structured Entity and Relationship candidates with exact source references. AI output never becomes canonical automatically; every candidate requires human review.
