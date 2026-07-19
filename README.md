@@ -4,6 +4,12 @@ Creative Knowledge Engine turns scattered creative material into a structured, s
 
 It is designed as a standalone product and as an integration-ready core module for CreativeOS. Knowledge is the primary domain model; graph views and future AI workflows are consumers of that Knowledge.
 
+## Links
+
+- Live Demo: https://creative-knowledge-engine.vercel.app
+- Demo Video: https://www.youtube.com/watch?v=Y0k9MBR0AoA
+- Source Code: https://github.com/yusakamotoce-cell/creative-knowledge-engine
+
 ## Current status
 
 This repository implements **Step 0–9**: domain contracts, Candidate Review, Import, canonical application, browser persistence, the official Project Astra regression fixture, browser review, deterministic Search, a read-only Knowledge Graph, versioned Knowledge JSON Export, optional server-side GPT-5.6 Live Extraction, and verified Vercel Production deployment. Step 9 is `COMPLETE: PRODUCTION_VERIFIED`.
